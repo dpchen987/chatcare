@@ -16,7 +16,7 @@ params = Params(
     # embedings params
 
     # llm params
-    llm_model_name="baichuan13b",  # `baichuan7b` or `baichuan13b` or `qwen` or `tinystory`
+    llm_model_name="baichuan13b",  # `baichuan7b` or `baichuan13b` or `qwen` or `chatglm2_6b`
     llm_checkpoint_dir="/aidata/junjie/data/model/llms/baichuan13b/baichuan-13b-chat-int4.flm",
     device="cpu",  # `cpu` or 'cuda'
 

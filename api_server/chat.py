@@ -29,7 +29,7 @@ def load_llm_model(params):
         from llms.baichuan13b import load_model, infer
         model = load_model(params.llm_checkpoint_dir, device_map)
     else:
-        from llms.tinystory import load_model, infer
+        from llms.chatglm2_6b import load_model, infer
         model, tokenizer = load_model(params.llm_checkpoint_dir, device_map)
 
     if params.debug:
