@@ -1,2 +1,4 @@
 # folder
 .idea
+__pycache__
+backup

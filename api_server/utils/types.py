@@ -55,3 +55,29 @@ class ChatCompletionResponse(BaseModel):
     object: Literal["chat.completion", "chat.completion.chunk"]
     choices: List[Union[ChatCompletionResponseChoice, ChatCompletionResponseStreamChoice]]
     created: Optional[int] = Field(default_factory=lambda: int(time.time()))
+
+
+class BaseResponse(BaseModel):
+    code: int = Field(200, description="HTTP status code")
+    msg: str = Field("success", description="HTTP status message")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "code": 200,
+                "msg": "success",
+            }
+        }
+
+
+class ListResponse(BaseResponse):
+    data: List[str] = Field(..., description="List of names")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "code": 200,
+                "msg": "success",
+                "data": ["doc1.docx", "doc2.pdf", "doc3.txt"],
+            }
+        }

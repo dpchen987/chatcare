@@ -6,16 +6,21 @@
 
 import torch
 import uvicorn
-import os
 from argparse import ArgumentParser
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from utils.types import *
-from utils.logger import logger
-from config import params
-from chat import chat_llm
+from utils import __version__
+from server.chat.chat_api import (
+    list_models, chat_direct_with_llm,
+    chat_direct_with_search_engine,
+    chat_with_knowledge_base
+)
+from server.knowledge_base.knowledge_base_api import (
+    list_kbs, create_kb, delete_kb
+)
 
 
 @asynccontextmanager
@@ -26,52 +31,80 @@ async def lifespan(app: FastAPI):  # collects GPU memory
         torch.cuda.ipc_collect()
 
 
-app = FastAPI(lifespan=lifespan)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-@app.get("/v1/models", response_model=ModelList)
-async def list_models():
-    """获取所有llm列表"""
-    global model_args
-    model_card = ModelCard(id=os.path.basename(params.llm_model))
-    return ModelList(data=[model_card])
-
-
-@app.post("/v1/chat/completions", response_model=ChatCompletionResponse)
-async def create_chat_completion(request: ChatCompletionRequest):
-    if request.messages[-1].role != "user":
-        raise HTTPException(status_code=400, detail="Invalid request")
-    query = request.messages[-1].content
-    prev_messages = request.messages[:-1]
-    # Temporarily, the system role does not work as expected. We advise that you write the setups for role-play in your query.
-    # if len(prev_messages) > 0 and prev_messages[0].role == "system":
-    #     query = prev_messages.pop(0).content + query
-    history = []
-    if len(prev_messages) % 2 == 0:
-        for i in range(0, len(prev_messages), 2):
-            if prev_messages[i].role == "user" and prev_messages[i + 1].role == "assistant":
-                history.append([prev_messages[i].content, prev_messages[i + 1].content])
-            else:
-                raise HTTPException(status_code=400, detail="Invalid request.")
-    else:
-        raise HTTPException(status_code=400, detail="Invalid request.")
-    # if request.stream:
-    #     generate = predict(query, history, request.model)
-    #     return EventSourceResponse(generate, media_type="text/event-stream")
-    response = await chat_llm(query, history=history)
-    choice_data = ChatCompletionResponseChoice(
-        index=0,
-        message=ChatMessage(role="assistant", content=response),
-        finish_reason="stop"
+def create_app():
+    app = FastAPI(
+        title="ChatCare API Server",
+        version=__version__,
+        lifespan=lifespan,
     )
-    return ChatCompletionResponse(model=request.model, choices=[choice_data], object="chat.completion")
+    # 跨域
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    app.get(
+        "/v1/models",
+        summary="可用llm模型列表",
+        response_model=ModelList
+    )(list_models)
+
+    # Tag: Chat
+    app.post(
+        "/v1/chat/completions",
+        tags=["Chat"],
+        summary="直接与 LLM 对话",
+        response_model=ChatCompletionResponse
+    )(chat_direct_with_llm)
+
+    app.post(
+        "/v1/chat/search_engine",
+        tags=["Chat"],
+        summary="直接与 Search Engine 对话",
+        response_model=ChatCompletionResponse
+    )(chat_direct_with_search_engine)
+
+    app.post(
+        "/v1/chat/knowledge_base",
+        tags=["Chat"],
+        summary="与知识库对话",
+        response_model=ChatCompletionResponse
+    )(chat_with_knowledge_base)
+
+    # Tag: Knowledge Base Management
+    app.get("/knowledge_base/list_knowledge_bases",
+            tags=["Knowledge Base Management"],
+            response_model=ListResponse,
+            summary="获取知识库列表")(list_kbs)
+
+    app.post("/knowledge_base/create_knowledge_base",
+             tags=["Knowledge Base Management"],
+             response_model=BaseResponse,
+             summary="创建知识库"
+             )(create_kb)
+
+    app.post("/knowledge_base/delete_knowledge_base",
+             tags=["Knowledge Base Management"],
+             response_model=BaseResponse,
+             summary="删除知识库"
+             )(delete_kb)
+
+    return app
+
+
+app = create_app()
+
+
+def run_api(host, port, **kwargs):
+    uvicorn.run(
+        app,
+        host=host,
+        port=port,
+    )
+    uvicorn.run(app, host=host, port=port)
 
 
 if __name__ == '__main__':
@@ -81,5 +114,4 @@ if __name__ == '__main__':
     parser.add_argument("-u", "--uri", type=str, default="0.0.0.0",
                         help="Demo server name.")
     args = parser.parse_args()
-
-    uvicorn.run(app, host=args.uri, port=args.port, workers=1)
+    run_api(host=args.uri, port=args.port, workers=1)

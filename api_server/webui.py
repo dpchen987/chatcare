@@ -2,7 +2,7 @@
 
 import gradio as gr
 
-from chat import chat_llm
+from server.chat.chat_llm import chat_llm
 
 
 async def chat(input, history):

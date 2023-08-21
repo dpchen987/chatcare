@@ -1,18 +1,9 @@
 # coding=utf-8
-
-
 from utils.types import *
 from utils.logger import logger
 from config import params
 from sse_starlette.sse import ServerSentEvent, EventSourceResponse
 
-
-# ------------------------------- chat by embeddings ----------------------------------------#
-async def chat_vs(query: str, history: List[List[str]]):
-    raise NotImplementedError
-
-
-# ------------------------------- chat by llm ----------------------------------------#
 
 def load_llm_model(params):
     """ 载入不同llm模型用 """
