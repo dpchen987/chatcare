@@ -9,11 +9,11 @@ params = Params(
     # api params
     host='0.0.0.0',
     port=8000,
-    chat_mode='llm',  # `llm`：大模型 or `vs`：向量搜索
+    chat_mode='llm',  # `llm`：大模型 or `embedings`：向量搜索
     url_db='./db',
     concurrency=10,
 
-    # vs params
+    # embedings params
 
     # llm params
     llm_model_name="baichuan13b",  # `baichuan7b` or `baichuan13b` or `qwen` or `tinystory`

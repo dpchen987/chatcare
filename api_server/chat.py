@@ -7,7 +7,7 @@ from config import params
 from sse_starlette.sse import ServerSentEvent, EventSourceResponse
 
 
-# ------------------------------- chat by vs ----------------------------------------#
+# ------------------------------- chat by embeddings ----------------------------------------#
 async def chat_vs(query: str, history: List[List[str]]):
     raise NotImplementedError
 
