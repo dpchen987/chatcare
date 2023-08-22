@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
 
-from utils.params import Params
-from utils.logger import logger
+from chatcare.utils.params import Params
+from chatcare.utils.logger import logger
 
 # sys param for chat
 params = Params(
@@ -16,9 +16,9 @@ params = Params(
     # embedings params
 
     # llm params
-    llm_model_name="baichuan13b",  # `baichuan7b` or `baichuan13b` or `qwen` or `chatglm2_6b`
-    llm_checkpoint_dir="/aidata/junjie/data/model/llms/baichuan13b/baichuan-13b-chat-int4.flm",
-    device="cpu",  # `cpu` or 'cuda'
+    llm_model_name="chatglm2_6b",  # `baichuan7b` or `baichuan13b` or `qwen` or `chatglm2_6b`
+    llm_checkpoint_dir="/aidata/junjie/data/model/modelscope/chatglm2-6b-int4",
+    device="cuda",  # `cpu` or 'cuda'
 
     # dev params
     debug=True,
@@ -39,4 +39,6 @@ def update_params_from_env():
 
 
 update_params_from_env()
-logger.info(f"{params=}")
+
+if params.debug:
+    logger.info(f"{params=}")

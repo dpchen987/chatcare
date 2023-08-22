@@ -2,9 +2,9 @@
 import os
 from fastapi import HTTPException
 
-from utils.types import *
-from server.chat.chat_llm import chat_llm
-from config import params
+from chatcare.utils.types import *
+from chatcare.api.chat_llm import chat_llm
+from chatcare.config import params
 
 
 async def list_models():

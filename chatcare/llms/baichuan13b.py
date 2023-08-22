@@ -3,7 +3,7 @@
 from fastllm_pytools import llm
 
 
-def load_model(checkpoint_path, device_map="auto"):
+def load_model(checkpoint_path, device="cuda"):
     model = llm.model(checkpoint_path)
     return model
 

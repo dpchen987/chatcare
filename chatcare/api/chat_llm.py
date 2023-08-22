@@ -1,7 +1,7 @@
 # coding=utf-8
-from utils.types import *
-from utils.logger import logger
-from config import params
+from chatcare.utils.types import *
+from chatcare.utils.logger import logger
+from chatcare.config import params
 from sse_starlette.sse import ServerSentEvent, EventSourceResponse
 
 
@@ -11,21 +11,21 @@ def load_llm_model(params):
     device_map = "cpu" if params.device == "cpu" else "auto"
     model, tokenizer, infer = None, None, None
     if llm_model_name == "baichuan7b":
-        from llms.baichuan7b import load_model, infer
+        from chatcare.llms.baichuan7b import load_model, infer
         raise NotImplementedError
     elif llm_model_name == "qwen":
-        from llms.qwen import load_model, infer
+        from chatcare.llms.qwen import load_model, infer
         raise NotImplementedError
     elif llm_model_name == "baichuan13b":
-        from llms.baichuan13b import load_model, infer
-        model = load_model(params.llm_checkpoint_dir, device_map)
+        from chatcare.llms.baichuan13b import load_model, infer
+        model = load_model(params.llm_checkpoint_dir, params.device)
     else:
-        from llms.chatglm2_6b import load_model, infer
-        model, tokenizer = load_model(params.llm_checkpoint_dir, device_map)
+        from chatcare.llms.chatglm2_6b import load_model, infer
+        model, tokenizer = load_model(params.llm_checkpoint_dir, params.device)
 
     if params.debug:
         logger.info(
-            f"Load model successful! || llm_model_name: {llm_model_name} || llm_checkpoint_dir: {llm_checkpoint_dir} || type: {type(model)}")
+            f"Load model successfully! || llm_model_name: {llm_model_name} || llm_checkpoint_dir: {llm_checkpoint_dir} || type: {type(model)}")
     return model, tokenizer, infer
 
 
@@ -64,7 +64,7 @@ async def chat_llm_stream(query: str, history: List[List[str]]):
 
 
 async def predict(query: str, history: List[List[str]], model_id: str):
-    """ offical code  """
+    """ Qwen official code  """
     global model, tokenizer
 
     choice_data = ChatCompletionResponseStreamChoice(

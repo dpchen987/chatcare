@@ -11,14 +11,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
-from utils.types import *
-from utils import __version__
-from server.chat.chat_api import (
+from chatcare.utils.types import *
+from chatcare.utils import __version__
+from chatcare.api.chat_api import (
     list_models, chat_direct_with_llm,
     chat_direct_with_search_engine,
     chat_with_knowledge_base
 )
-from server.knowledge_base.knowledge_base_api import (
+from chatcare.api.knowledge_base_api import (
     list_kbs, create_kb, delete_kb
 )
 
@@ -46,13 +46,14 @@ def create_app():
         allow_headers=["*"],
     )
 
+    # Tag: Chat
     app.get(
         "/v1/models",
+        tags=["Chat"],
         summary="可用llm模型列表",
         response_model=ModelList
     )(list_models)
 
-    # Tag: Chat
     app.post(
         "/v1/chat/completions",
         tags=["Chat"],

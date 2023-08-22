@@ -1,5 +1,5 @@
 # coding=utf-8
-from utils.types import *
+from chatcare.utils.types import *
 
 
 async def list_kbs():
