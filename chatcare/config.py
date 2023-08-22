@@ -44,4 +44,4 @@ def update_params_from_env():
 update_params_from_env()
 
 if params.debug:
-    logger.info(f"{params=}")
+    logger.info(f"Params of ChatCare: {params}")
