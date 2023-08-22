@@ -29,7 +29,7 @@ def load_llm_model(params):
     return model, tokenizer, infer
 
 
-if params.chat_mode == "llm":
+if params.chat_mode == "llms":
     model, tokenizer, infer = load_llm_model(params)
 
 

@@ -9,7 +9,7 @@ params = Params(
     # api params
     host='0.0.0.0',
     port=8000,
-    chat_mode='llm',  # `llm`：大模型 or `embedings`：向量搜索
+    chat_mode='llms',  # `llms`：大模型 or `embedings`：向量搜索
     url_db='./db',
     concurrency=10,
 
@@ -36,6 +36,9 @@ def update_params_from_env():
     """
     global params
     params.host = os.getenv('HOST', params.host)
+    params.port = os.getenv("PORT", params.port)
+    params.chat_mode = os.getenv("CHAT_MODE", params.chat_mode)
+    params.debug = os.getenv("DEBUG", params.debug)
 
 
 update_params_from_env()

@@ -6,13 +6,13 @@
 
 import torch
 import uvicorn
-from argparse import ArgumentParser
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from chatcare.utils.types import *
 from chatcare.utils import __version__
+from chatcare.config import params
 from chatcare.api.chat_api import (
     list_models, chat_direct_with_llm,
     chat_direct_with_search_engine,
@@ -104,15 +104,13 @@ def run_api(host, port, **kwargs):
         app,
         host=host,
         port=port,
+        **kwargs
     )
-    uvicorn.run(app, host=host, port=port)
 
 
 if __name__ == '__main__':
-    parser = ArgumentParser()
-    parser.add_argument("-p", "--port", type=int, default=8000,
-                        help="Demo server port.")
-    parser.add_argument("-u", "--uri", type=str, default="0.0.0.0",
-                        help="Demo server name.")
-    args = parser.parse_args()
-    run_api(host=args.uri, port=args.port, workers=1)
+    run_api(
+        host=params.host,
+        port=params.port,
+        workers=1
+    )
