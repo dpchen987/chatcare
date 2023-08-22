@@ -14,6 +14,7 @@ params = Params(
     concurrency=10,
 
     # embedings params
+    bge_model_path='/workspace/models/bge-base-zh',
 
     # llm params
     llm_model_name="chatglm2_6b",  # `baichuan7b` or `baichuan13b` or `qwen` or `chatglm2_6b`
