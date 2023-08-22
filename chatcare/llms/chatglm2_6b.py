@@ -27,8 +27,8 @@ def infer_stream():
 
 
 if __name__ == '__main__':
-    checkpoint_path = r'/home/junjie/data/model/modelscope/chatglm2-6b-int4'
-    model, tokenizer = load_model(checkpoint_path, device='cpu')
+    checkpoint_path = r'/workspace/models/chatglm2-6b-int4'
+    model, tokenizer = load_model(checkpoint_path, device='cuda')
     print('-' * 88)
     response = infer(model, tokenizer, "上海颐家是什么？")
     print(response)

@@ -99,18 +99,14 @@ def create_app():
 app = create_app()
 
 
-def run_api(host, port, **kwargs):
+def run_api():
     uvicorn.run(
         app,
-        host=host,
-        port=port,
-        **kwargs
-    )
-
-
-if __name__ == '__main__':
-    run_api(
         host=params.host,
         port=params.port,
         workers=1
     )
+
+
+if __name__ == '__main__':
+    run_api()
