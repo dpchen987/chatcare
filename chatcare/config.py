@@ -16,6 +16,17 @@ params = Params(
     # embedings params
     bge_model_path='/workspace/models/bge-base-zh',
 
+    # classification params
+    num_class=2,
+    embed_dim=768,
+    classify_model_path='/workspace/models/embedding_classify.pt',
+
+    # vector store: milvus
+    milvus_host='127.0.0.1',
+    milvus_port=19530,
+    milvus_collection_name='care_qa',
+
+
     # llm params
     llm_model_name="chatglm2_6b",  # `baichuan7b` or `baichuan13b` or `qwen` or `chatglm2_6b`
     llm_checkpoint_dir="/aidata/junjie/data/model/modelscope/chatglm2-6b-int4",
