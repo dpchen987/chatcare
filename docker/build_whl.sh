@@ -4,7 +4,7 @@
 cd ../
 
 # clean old build files
-rm -rf build dist chatcare.egg-info chatcare/*\.c dist/chatcare-*-linux_x86_64.whl
+rm -rf build dist chatcare.egg-info chatcare/*\.c docker/chatcare-*-linux_x86_64.whl
 
 # build
 python setup.py bdist_wheel
