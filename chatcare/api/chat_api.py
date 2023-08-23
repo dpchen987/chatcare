@@ -10,7 +10,7 @@ from chatcare.config import params
 async def list_models():
     """获取所有llm列表"""
     global model_args
-    model_card = ModelCard(id=os.path.basename(params.llm_model))
+    model_card = ModelCard(id=params.llm_model_name)
     return ModelList(data=[model_card])
 
 

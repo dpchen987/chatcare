@@ -29,7 +29,7 @@ params = Params(
 
     # llm params
     llm_model_name="chatglm2_6b",  # `baichuan7b` or `baichuan13b` or `qwen` or `chatglm2_6b`
-    llm_checkpoint_dir="/aidata/junjie/data/model/modelscope/chatglm2-6b-int4",
+    llm_checkpoint_dir="/workspace/models/chatglm2-6b-int4",
     device="cuda",  # `cpu` or 'cuda'
 
     # dev params
