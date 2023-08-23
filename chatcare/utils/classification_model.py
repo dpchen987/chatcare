@@ -2,7 +2,7 @@ from torch import nn
 
 
 class EmbeddingClassification(nn.Module):
-    def __init__(self, embed_dim, num_class, num_layers):
+    def __init__(self, embed_dim, num_class):
         super().__init__()
         step = embed_dim // 3
         self.dropout = nn.Dropout(0.10)

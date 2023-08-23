@@ -13,7 +13,6 @@ from datetime import datetime
 from chatcare.utils.classification_model import EmbeddingClassification
 
 torch.manual_seed(1258)
-num_layers = 2
 msize = 'base'
 zzz = {
     'small': 512,
@@ -78,7 +77,7 @@ def train(train_data_path, test_data_path):
     assert num_class == 2
     lr = 0.001
     momentum = 0.9
-    model = EmbeddingClassification(embed_dim, num_class, num_layers)
+    model = EmbeddingClassification(embed_dim, num_class)
     loss_fn = torch.nn.CrossEntropyLoss()
     # optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
@@ -149,8 +148,8 @@ def infer(model_path):
         with torch.no_grad():
             ilabel = model(embed)
         return ilabel
-        
-    model = EmbeddingClassification(embed_dim, num_class, num_layers)
+
+    model = EmbeddingClassification(embed_dim, num_class)
     model.load_state_dict(torch.load(model_path))
     model.eval()
     from chatcare.embeddings.embedding_bge import bge
