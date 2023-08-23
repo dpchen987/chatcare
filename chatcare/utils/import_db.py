@@ -74,7 +74,7 @@ def connect_db(name):
     return collection
 
 
-def import_data(collection, excel_file, import_mode):
+def import_data(collection, name, excel_file, import_mode):
     id_start = 0
     excel_data = pd.read_excel(excel_file)
 
@@ -84,7 +84,9 @@ def import_data(collection, excel_file, import_mode):
             collection.load()
             id_start = collection.query(expr="id>=0")[-1]['id']
     elif import_mode == "all":
-        collection.delete()
+        if not collection.is_empty:
+            collection.drop()
+            collection = create_collection(name)
 
     questions = list(excel_data['question'])
     data = [
@@ -93,7 +95,9 @@ def import_data(collection, excel_file, import_mode):
         questions,                                          # question
         list(excel_data['answer'])                          # answer
     ]
-    collection.insert(data)
+    primary_key = data[0]
+
+    collection.insert(data, primary_keys=primary_key)
     collection.flush()
 
     if id_start == 0:
@@ -115,4 +119,5 @@ if __name__ == '__main__':
     create_connection()
     collection = connect_db(args.db_name)
 
-    import_data(collection, args.excel_file, args.import_mode)
+    import_data(collection, args.db_name, args.excel_file, args.import_mode)
+    
