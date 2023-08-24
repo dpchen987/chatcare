@@ -35,6 +35,7 @@ async def chat_completions(request: ChatCompletionRequest) -> ChatCompletionResp
 
 async def chat_direct_with_llm(request: ChatCompletionRequest):
     """直接与LLM对话，暂不支持历史、多轮对话"""
+    global model, tokenizer, infer
     if request.messages[-1].role != "user":
         raise HTTPException(status_code=400, detail="Invalid request")
     query = request.messages[-1].content
