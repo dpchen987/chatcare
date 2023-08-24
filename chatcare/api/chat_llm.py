@@ -2,21 +2,14 @@
 from chatcare.utils.types import *
 from chatcare.utils.logger import logger
 from chatcare.config import params
-from sse_starlette.sse import ServerSentEvent, EventSourceResponse
 
 
 def load_llm_model(params):
     """ 载入不同llm模型用 """
+    global model, tokenizer, infer
     llm_model_name, llm_checkpoint_dir = params.llm_model_name, params.llm_checkpoint_dir
-    device_map = "cpu" if params.device == "cpu" else "auto"
     model, tokenizer, infer = None, None, None
-    if llm_model_name == "baichuan7b":
-        from chatcare.llms.baichuan7b import load_model, infer
-        raise NotImplementedError
-    elif llm_model_name == "qwen":
-        from chatcare.llms.qwen import load_model, infer
-        raise NotImplementedError
-    elif llm_model_name == "baichuan13b":
+    if llm_model_name == "baichuan13b":
         from chatcare.llms.baichuan13b import load_model, infer
         model = load_model(params.llm_checkpoint_dir, params.device)
     else:
@@ -25,11 +18,12 @@ def load_llm_model(params):
 
     if params.debug:
         logger.info(
-            f"Load model successfully! || llm_model_name: {llm_model_name} || llm_checkpoint_dir: {llm_checkpoint_dir} || type: {type(model)}")
+            f"Load llm model successfully! || llm_model_name: {llm_model_name} || llm_checkpoint_dir: {llm_checkpoint_dir} || type: {type(model)}")
     return model, tokenizer, infer
 
 
-if params.chat_mode == "llms":
+# 启动预加载模型
+if params.chat_mode == "llm":
     model, tokenizer, infer = load_llm_model(params)
 
 
@@ -49,7 +43,7 @@ async def chat_llm(query: str, history: List[List[str]]) -> str:
     content = content.strip()
     if params.debug:
         logger.info(
-            f"Infer successfully! || Cost_time(s): {time.time() - time_start} || Query: {query} || Response: {content}")
+            f"Chat with llm successfully! || Cost_time(s): {time.time() - time_start} || Query: {query} || Content: {content}")
     return content
 
 
@@ -61,42 +55,3 @@ async def chat_llm_stream(query: str, history: List[List[str]]):
     :return:
     """
     raise NotImplementedError
-
-
-async def predict(query: str, history: List[List[str]], model_id: str):
-    """ Qwen official code  """
-    global model, tokenizer
-
-    choice_data = ChatCompletionResponseStreamChoice(
-        index=0,
-        delta=DeltaMessage(role="assistant"),
-        finish_reason=None
-    )
-    chunk = ChatCompletionResponse(model=model_id, choices=[choice_data], object="chat.completion.chunk")
-    yield "{}".format(chunk.model_dump_json(exclude_unset=True))
-
-    current_length = 0
-
-    for new_response in model.chat_stream(tokenizer, query, history):
-        if len(new_response) == current_length:
-            continue
-
-        new_text = new_response[current_length:]
-        current_length = len(new_response)
-
-        choice_data = ChatCompletionResponseStreamChoice(
-            index=0,
-            delta=DeltaMessage(content=new_text),
-            finish_reason=None
-        )
-        chunk = ChatCompletionResponse(model=model_id, choices=[choice_data], object="chat.completion.chunk")
-        yield "{}".format(chunk.model_dump_json(exclude_unset=True))
-
-    choice_data = ChatCompletionResponseStreamChoice(
-        index=0,
-        delta=DeltaMessage(),
-        finish_reason="stop"
-    )
-    chunk = ChatCompletionResponse(model=model_id, choices=[choice_data], object="chat.completion.chunk")
-    yield "{}".format(chunk.model_dump_json(exclude_unset=True))
-    yield '[DONE]'
