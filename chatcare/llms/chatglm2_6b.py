@@ -14,7 +14,8 @@ def load_model(checkpoint_path, device="cuda"):
 def infer(model, tokenizer, query: str, history: list = None):
     if history:
         raise NotImplementedError
-    response, history = model.chat(tokenizer, query, history=history)
+    prompt_template = f'假设你现在是上海颐家医疗养老服务有限公司开发的医疗养老人工智能助手，名字叫颐小爱，你擅长的领域是为老年人的养老和医疗护理的建议，请回答下列问题"{query}"'
+    response, history = model.chat(tokenizer, prompt_template, history=history)
     return response
 
 
