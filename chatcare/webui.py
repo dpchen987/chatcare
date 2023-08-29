@@ -62,13 +62,17 @@ def main():
             with gr.Column(scale=15, elem_id="column2"):
                 chatbot = gr.Chatbot(label="ChatCare")
                 tb_input = gr.Textbox(
-                    label="请输入内容：", value="上海颐家是什么?",
+                    label="请输入内容：", value="上海颐家简介",
                     placeholder="输入问题后，回车开始生成！"
                 )
                 tb_input.submit(chat, [tb_input, chatbot, dd_mode], [tb_input, chatbot])
                 btn_clear.click(lambda x, y: ("", None), [tb_input, chatbot], [tb_input, chatbot])
 
-    app.launch(server_name=params.webui_host, server_port=params.webui_port, share=True)
+    app.launch(
+        auth=("yixiaoai", "AI**yshy"),
+        server_name=params.webui_host,
+        server_port=params.webui_port,
+        share=True)
 
 
 if __name__ == '__main__':
