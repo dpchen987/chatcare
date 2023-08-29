@@ -14,7 +14,7 @@ from chatcare.utils.types import *
 from chatcare.utils import __version__
 from chatcare.config import params
 from chatcare.api.chat_api import (
-    list_models, chat_direct_with_llm,
+    list_models, chat_completions, chat_direct_with_llm,
     chat_direct_with_search_engine,
     chat_with_knowledge_base
 )
@@ -57,21 +57,28 @@ def create_app():
     app.post(
         "/v1/chat/completions",
         tags=["Chat"],
-        summary="直接与 LLM 对话",
+        summary="ChatCare对话主接口",
         response_model=ChatCompletionResponse
-    )(chat_direct_with_llm)
+    )(chat_completions)
 
     app.post(
         "/v1/chat/search_engine",
         tags=["Chat"],
-        summary="直接与 Search Engine 对话",
+        summary="(DEV) 直接与 Search Engine 对话",
         response_model=ChatCompletionResponse
     )(chat_direct_with_search_engine)
 
     app.post(
+        "/v1/chat/llm",
+        tags=["Chat"],
+        summary="(DEV) 直接与 LLM 对话",
+        response_model=ChatCompletionResponse
+    )(chat_direct_with_llm)
+
+    app.post(
         "/v1/chat/knowledge_base",
         tags=["Chat"],
-        summary="与知识库对话",
+        summary="(DEV) 与llm+知识库对话",
         response_model=ChatCompletionResponse
     )(chat_with_knowledge_base)
 
