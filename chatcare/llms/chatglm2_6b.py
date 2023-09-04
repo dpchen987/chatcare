@@ -1,3 +1,5 @@
+import time
+
 from transformers import AutoTokenizer, AutoModel
 from chatcare.utils.logger import logger
 
@@ -15,21 +17,29 @@ def infer(model, tokenizer, query: str, history: list = None):
     if history:
         raise NotImplementedError
     prompt_template = f'假设你现在是上海颐家医疗养老服务有限公司开发的医疗养老人工智能助手，名字叫颐小爱，你擅长为老年人提供养老和医疗护理、康复相关的建议，请回答下列问题"{query}"'
-    response, history = model.chat(tokenizer, prompt_template, history=history)
-    return response
+    content, history = model.chat(tokenizer, prompt_template, history=history)
+    return content
 
 
-def infer_stream():
+def infer_stream(model, tokenizer, query: str, history: list = None, top_p: float = 1.0, temperature: float = 1.0):
     """
     流式推理
     :return:
     """
-    raise NotImplementedError
+    prompt_template = f'假设你现在是上海颐家医疗养老服务有限公司开发的医疗养老人工智能助手，名字叫颐小爱，你擅长为老年人提供养老和医疗护理、康复相关的建议，请回答下列问题"{query}"'
+    for content, query_content in model.stream_chat(tokenizer, prompt_template, history, top_p=top_p,
+                                                    temperature=temperature):
+        yield content
 
 
 if __name__ == '__main__':
     checkpoint_path = r'/workspace/models/chatglm2-6b-int4'
     model, tokenizer = load_model(checkpoint_path, device='cuda')
-    print('-' * 88)
-    response = infer(model, tokenizer, "上海颐家是什么？")
-    print(response)
+    print('direct', '-' * 88)
+    # response = infer(model, tokenizer, "上海颐家是什么？")
+    # print(response)
+
+    print('stream', '-' * 88)
+    for item in infer_stream(model, tokenizer, "上海颐家是什么？"):
+        print(item, end='\r')
+        time.sleep(0.01)

@@ -4,7 +4,7 @@
 from chatcare.utils.types import *
 from chatcare.utils.logger import logger
 from chatcare.config import params
-from chatcare.chains.chain import bge, chain
+from chatcare.chains.chain import chain
 
 
 async def chat_search_engine(query: str, history: List[List[str]] = None):
@@ -17,6 +17,18 @@ async def chat_search_engine(query: str, history: List[List[str]] = None):
     return content
 
 
+async def chat_search_engine_stream(query: str, history: List[List[str]] = None):
+    time_start = time.time()
+    content = chain(query)
+    content = content.strip()
+    for chunk in content:
+        yield chunk
+    if params.debug:
+        logger.info(
+            f"Chat stream with search engine successfully! || Cost_time(s): {time.time() - time_start} || Query: {query} || Content: {content}")
+
+
 if __name__ == '__main__':
-    content = chat_search_engine(query="肺炎需要注意什么？")
+    query = "肺炎需要注意什么？"
+    content = chat_search_engine(query)
     print(content)

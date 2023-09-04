@@ -6,25 +6,25 @@ from chatcare.config import params
 
 def load_llm_model(params):
     """ 载入不同llm模型用 """
-    global model, tokenizer, infer
+    global model, tokenizer, infer, infer_stream
     llm_model_name, llm_checkpoint_dir = params.llm_model_name, params.llm_checkpoint_dir
     model, tokenizer, infer = None, None, None
     if llm_model_name == "baichuan13b":
-        from chatcare.llms.baichuan13b import load_model, infer
+        from chatcare.llms.baichuan13b import load_model, infer, infer_stream
         model = load_model(params.llm_checkpoint_dir, params.device)
     else:
-        from chatcare.llms.chatglm2_6b import load_model, infer
+        from chatcare.llms.chatglm2_6b import load_model, infer, infer_stream
         model, tokenizer = load_model(params.llm_checkpoint_dir, params.device)
 
     if params.debug:
         logger.info(
             f"Load llm model successfully! || llm_model_name: {llm_model_name} || llm_checkpoint_dir: {llm_checkpoint_dir} || type: {type(model)}")
-    return model, tokenizer, infer
+    return model, tokenizer, infer, infer_stream
 
 
 # 启动预加载模型
 if params.chat_mode == "llm":
-    model, tokenizer, infer = load_llm_model(params)
+    model, tokenizer, infer, infer_stream = load_llm_model(params)
 
 
 async def chat_llm(query: str, history: List[List[str]]) -> str:
@@ -54,4 +54,19 @@ async def chat_llm_stream(query: str, history: List[List[str]]):
     :param history:
     :return:
     """
-    raise NotImplementedError
+    content = ""
+    time_start = time.time()
+    global model, tokenizer, infer
+    if params.llm_model_name == "baichuan13b":
+        content_generator = infer_stream(model, query, history)
+    else:
+        content_generator = infer_stream(model, tokenizer, query, history)
+
+    for chunk in content_generator:
+        chunk = chunk.replace(content, "")
+        content += chunk
+        yield chunk
+
+    if params.debug:
+        logger.info(
+            f"Chat stream with llm successfully! || Cost_time(s): {time.time() - time_start} || Query: {query} || Content: {content}")

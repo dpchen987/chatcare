@@ -1,1 +1,2 @@
 fastapi
+hnswlib==0.7.0

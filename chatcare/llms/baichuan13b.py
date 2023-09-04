@@ -15,6 +15,10 @@ def infer(model, query: str, history: list = None):
     return response
 
 
+def infer_stream():
+    raise NotImplementedError
+
+
 if __name__ == '__main__':
     checkpoint_path = "/aidata/junjie/data/model/llms/baichuan13b/baichuan-13b-chat-int4.flm"
     model = load_model(checkpoint_path)
