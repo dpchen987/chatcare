@@ -2,6 +2,7 @@
 from fastapi import HTTPException
 
 from chatcare.utils.types import *
+from chatcare.utils.logger import logger
 from chatcare.api.chat_llm import chat_llm, load_llm_model
 from chatcare.api.chat_search_engine import chat_search_engine
 from chatcare.config import params
@@ -25,6 +26,7 @@ async def chat_completions(request: ChatCompletionRequest) -> ChatCompletionResp
     try:
         return await chat_completions_api(request)
     except:
+        logger.exception('An error occurred in api: `/v1/chat/completions`!')
         choice_data = ChatCompletionResponseChoice(
             index=0,
             message=ChatMessage(role="assistant", content="很抱歉，请重新问我一次！"),

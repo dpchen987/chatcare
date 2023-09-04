@@ -3,6 +3,7 @@ import os
 
 from chatcare.utils.params import Params
 from chatcare.utils.logger import logger
+from chatcare.utils import __proj_dir__
 
 # sys param for chat
 params = Params(
@@ -10,7 +11,7 @@ params = Params(
     host='0.0.0.0',
     port=8000,
     chat_mode='se',  # `se`：向量搜索 or `llm`：大模型 or `kb`：llm+知识库(待开发)
-    url_db='./db',
+    vector_db='hnsw',  # 选择向量搜索数据库 `milvus` or `hnsw`
     concurrency=10,
 
     # webui params
@@ -24,6 +25,11 @@ params = Params(
     num_class=2,
     embed_dim=768,
     classify_model_path='/workspace/models/embedding_classify.pt',
+
+    # vector store: hnsw
+    hnsw_kb_init_jsonl=os.path.join(__proj_dir__, "knowledge_base", "qa", "example.jsonl"),  # 初始化db的问答对
+    hnsw_kb_index_file=os.path.join(__proj_dir__, "knowledge_base", "db", "kb_index.bin"),
+    hnsw_kb_text_file=os.path.join(__proj_dir__, "knowledge_base", "db", "kb_text.bin"),
 
     # vector store: milvus
     milvus_host='127.0.0.1',
