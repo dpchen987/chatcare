@@ -1,4 +1,6 @@
 # coding=utf-8
+from typing import Optional
+
 from chatcare.utils.types import *
 from chatcare.utils.logger import logger
 from chatcare.config import params
@@ -27,7 +29,7 @@ if params.chat_mode == "llm":
     model, tokenizer, infer, infer_stream = load_llm_model(params)
 
 
-async def chat_llm(query: str, history: List[List[str]]) -> str:
+async def chat_llm(query: str, history: Optional[List[List[str]]] = None) -> str:
     """
     llm单次推理，非流式
     :param query:
@@ -47,7 +49,7 @@ async def chat_llm(query: str, history: List[List[str]]) -> str:
     return content
 
 
-async def chat_llm_stream(query: str, history: List[List[str]]):
+async def chat_llm_stream(query: str, history: Optional[List[List[str]]] = None):
     """
     llm流式推理
     :param query:
