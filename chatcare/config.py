@@ -27,8 +27,8 @@ params = Params(
 
     # vector store: hnsw
     hnsw_kb_init_jsonl="/workspace/knowledge_base/qa/example.jsonl",  # 初始化db的问答对
-    hnsw_kb_index_file="/workspace/knowledge_base/qa/kb_index.bin",
-    hnsw_kb_text_file="/workspace/knowledge_base/qa/kb_text.bin",
+    hnsw_kb_index_file="/workspace/knowledge_base/db/kb_index.bin",
+    hnsw_kb_text_file="/workspace/knowledge_base/db/kb_text.bin",
 
     # vector store: milvus
     milvus_host='127.0.0.1',
