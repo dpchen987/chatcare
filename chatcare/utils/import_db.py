@@ -53,7 +53,7 @@ def create_collection(collection_name):
                             description="float vector", dim=_DIM,
                             is_primary=False)
     field_q = FieldSchema(name="question",
-                          dtype=DataType.VARCHAR, max_length=64)
+                          dtype=DataType.VARCHAR, max_length=1024)
     field_a = FieldSchema(name="answer",
                           dtype=DataType.VARCHAR, max_length=8192)
     schema = CollectionSchema(fields=[field_id, field_vec, field_q, field_a],
