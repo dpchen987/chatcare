@@ -75,7 +75,7 @@ def train(train_data_path, test_data_path):
     assert num_class == len(set(labels))
     print(f'-- {embed_dim = }, {num_class = } ===================')
     assert num_class == 2
-    lr = 0.001
+    lr = 0.0001
     momentum = 0.9
     model = EmbeddingClassification(embed_dim, num_class)
     loss_fn = torch.nn.CrossEntropyLoss()

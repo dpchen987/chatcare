@@ -1,39 +1,35 @@
 # coding=utf-8
+from typing import Optional
+
 from chatcare.utils.types import *
 from chatcare.utils.logger import logger
 from chatcare.config import params
-from sse_starlette.sse import ServerSentEvent, EventSourceResponse
 
 
 def load_llm_model(params):
     """ 载入不同llm模型用 """
+    global model, tokenizer, infer, infer_stream
     llm_model_name, llm_checkpoint_dir = params.llm_model_name, params.llm_checkpoint_dir
-    device_map = "cpu" if params.device == "cpu" else "auto"
     model, tokenizer, infer = None, None, None
-    if llm_model_name == "baichuan7b":
-        from chatcare.llms.baichuan7b import load_model, infer
-        raise NotImplementedError
-    elif llm_model_name == "qwen":
-        from chatcare.llms.qwen import load_model, infer
-        raise NotImplementedError
-    elif llm_model_name == "baichuan13b":
-        from chatcare.llms.baichuan13b import load_model, infer
+    if llm_model_name == "baichuan13b":
+        from chatcare.llms.baichuan13b import load_model, infer, infer_stream
         model = load_model(params.llm_checkpoint_dir, params.device)
     else:
-        from chatcare.llms.chatglm2_6b import load_model, infer
+        from chatcare.llms.chatglm2_6b import load_model, infer, infer_stream
         model, tokenizer = load_model(params.llm_checkpoint_dir, params.device)
 
     if params.debug:
         logger.info(
-            f"Load model successfully! || llm_model_name: {llm_model_name} || llm_checkpoint_dir: {llm_checkpoint_dir} || type: {type(model)}")
-    return model, tokenizer, infer
+            f"Load llm model successfully! || llm_model_name: {llm_model_name} || llm_checkpoint_dir: {llm_checkpoint_dir} || type: {type(model)}")
+    return model, tokenizer, infer, infer_stream
 
 
-if params.chat_mode == "llms":
-    model, tokenizer, infer = load_llm_model(params)
+# 启动预加载模型
+if params.chat_mode == "llm":
+    model, tokenizer, infer, infer_stream = load_llm_model(params)
 
 
-async def chat_llm(query: str, history: List[List[str]]) -> str:
+async def chat_llm(query: str, history: Optional[List[List[str]]] = None) -> str:
     """
     llm单次推理，非流式
     :param query:
@@ -49,54 +45,30 @@ async def chat_llm(query: str, history: List[List[str]]) -> str:
     content = content.strip()
     if params.debug:
         logger.info(
-            f"Infer successfully! || Cost_time(s): {time.time() - time_start} || Query: {query} || Response: {content}")
+            f"Chat with llm successfully! || Cost_time(s): {time.time() - time_start} || Query: {query} || Content: {content}")
     return content
 
 
-async def chat_llm_stream(query: str, history: List[List[str]]):
+async def chat_llm_stream(query: str, history: Optional[List[List[str]]] = None):
     """
     llm流式推理
     :param query:
     :param history:
     :return:
     """
-    raise NotImplementedError
+    content = ""
+    time_start = time.time()
+    global model, tokenizer, infer
+    if params.llm_model_name == "baichuan13b":
+        content_generator = infer_stream(model, query, history)
+    else:
+        content_generator = infer_stream(model, tokenizer, query, history)
 
+    for chunk in content_generator:
+        chunk = chunk.replace(content, "")
+        content += chunk
+        yield chunk
 
-async def predict(query: str, history: List[List[str]], model_id: str):
-    """ Qwen official code  """
-    global model, tokenizer
-
-    choice_data = ChatCompletionResponseStreamChoice(
-        index=0,
-        delta=DeltaMessage(role="assistant"),
-        finish_reason=None
-    )
-    chunk = ChatCompletionResponse(model=model_id, choices=[choice_data], object="chat.completion.chunk")
-    yield "{}".format(chunk.model_dump_json(exclude_unset=True))
-
-    current_length = 0
-
-    for new_response in model.chat_stream(tokenizer, query, history):
-        if len(new_response) == current_length:
-            continue
-
-        new_text = new_response[current_length:]
-        current_length = len(new_response)
-
-        choice_data = ChatCompletionResponseStreamChoice(
-            index=0,
-            delta=DeltaMessage(content=new_text),
-            finish_reason=None
-        )
-        chunk = ChatCompletionResponse(model=model_id, choices=[choice_data], object="chat.completion.chunk")
-        yield "{}".format(chunk.model_dump_json(exclude_unset=True))
-
-    choice_data = ChatCompletionResponseStreamChoice(
-        index=0,
-        delta=DeltaMessage(),
-        finish_reason="stop"
-    )
-    chunk = ChatCompletionResponse(model=model_id, choices=[choice_data], object="chat.completion.chunk")
-    yield "{}".format(chunk.model_dump_json(exclude_unset=True))
-    yield '[DONE]'
+    if params.debug:
+        logger.info(
+            f"Chat stream with llm successfully! || Cost_time(s): {time.time() - time_start} || Query: {query} || Content: {content}")

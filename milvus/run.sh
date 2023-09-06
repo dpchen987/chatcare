@@ -1,1 +1,1 @@
-docker-compose up -d
+DOCKER_VOLUME_DIRECTORY=/workspace/ docker-compose up -d
