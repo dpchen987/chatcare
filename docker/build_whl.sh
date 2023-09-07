@@ -11,7 +11,7 @@ python setup.py bdist_wheel
 cp dist/chatcare-*-linux_x86_64.whl docker
 
 # clean build files
-rm -rf build dist chatcare.egg-info chatcare/*\.c
-
+rm -rf build dist chatcare.egg-info
+find chatcare/ -type f -name '*.c' -delete
 # install local whl
 #pip install --force-reinstall docker/chatcare-*-linux_x86_64.whl
