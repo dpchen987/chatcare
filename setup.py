@@ -68,7 +68,11 @@ def main(use_cython=False):
     # 暂时不编译data_model,  需把该模块加到setup()的packages里面
     extensions = [
         Extension(f'{pkg_name}/*.so', [f"{pkg_name}/*.py"]),
-        # Extension(f'{pkg_name}/gpvad_onnx/*.so', [f"{pkg_name}/gpvad_onnx/*.py"]),
+        Extension(f'{pkg_name}/api/*.so', [f"{pkg_name}/api/*.py"]),
+        Extension(f'{pkg_name}/chains/*.so', [f"{pkg_name}/chains/*.py"]),
+        Extension(f'{pkg_name}/embeddings/*.so', [f"{pkg_name}/embeddings/*.py"]),
+        Extension(f'{pkg_name}/llms/*.so', [f"{pkg_name}/llms/*.py"]),
+        Extension(f'{pkg_name}/utils/*.so', [f"{pkg_name}/utils/*.py"]),
     ]
     if use_cython:
         ext_modules = cythonize(
@@ -94,14 +98,14 @@ def main(use_cython=False):
         ext_modules=ext_modules,
         entry_points={
             'console_scripts': [
-                'chatcare=chatcare.web_api:run_api',
+                'chatcare=chatcare.webapi:run_api',
             ]
         },
-        package_data={pkg_name: get_package_data()},
+        # package_data={pkg_name: get_package_data()},
         # include_package_data=True,
-        cmdclass={
-            'build_py': build_py
-        },
+        # cmdclass={
+        #     'build_py': build_py
+        # },
 
     )
 
