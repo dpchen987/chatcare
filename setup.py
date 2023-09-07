@@ -9,7 +9,7 @@ from setuptools.command.build_py import build_py as build_py_orig
 from Cython.Distutils import build_ext
 from Cython.Build import cythonize
 
-from chatcare.utils import __version__
+from chatcare import __version__
 
 pkg_name = 'chatcare'
 
