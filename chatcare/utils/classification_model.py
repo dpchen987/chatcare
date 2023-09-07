@@ -26,3 +26,15 @@ class EmbeddingClassification(nn.Module):
         x = self.fc2(x)
         x = self.softmax(x)
         return x
+
+
+if __name__ == '__main__':
+    model = EmbeddingClassification(768, 2)
+    print(model)
+    nums = []
+    for p in model.parameters():
+        print(p.data.shape, p.numel())
+        nums.append(p.numel())
+    num_params = sum(nums)
+    print('the number of model params: {:,d}'.format(num_params), nums)
+    
