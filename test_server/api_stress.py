@@ -32,10 +32,8 @@ def get_args():
 async def test_coro(api, taskid, text, result):
     begin = time.time()
     query = {
-        'task_id': taskid,
         'text': text,
-        # Add other query parameters specific to the new API here
-    }
+   }
     async with aiohttp.ClientSession() as session:
         async with session.post(api, json=query) as resp:
             response_text = await resp.text()
@@ -50,7 +48,7 @@ async def test_coro(api, taskid, text, result):
 
 
 async def main(args):
-    texts = args.text
+    texts = args.texts
     tasks = set()
     result = []
     begin = time.time()
