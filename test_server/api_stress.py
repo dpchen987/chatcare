@@ -20,70 +20,77 @@ def get_args():
         '-t', '--texts', type=str, required=True,
         help='test texts')
     parser.add_argument(
-        '-c', '--concurrence', type=int, required=True,
+        '-c', '--num_concurrence', type=int, required=True,
         help='Number of concurrent queries')
-    parser.add_argument(
-        '-n', '--num_query', type=int, default=0,
-        help='Total number of queries (0 for all)')
+    # parser.add_argument(
+    #     '-n', '--num_query', type=int, default=0,
+    #     help='Total number of queries (0 for all)')
     args = parser.parse_args()
     return args
 
 
-async def test_coro(api, taskid, text, result):
+def print_result(info):
+    length = max([len(k) for k in info])
+    for k, v in info.items():
+        print(f'\t{k: >{length}} : {v}')
+        
+        
+async def test_coro(api, text, times):
     begin = time.time()
     query = {
-        'text': text,
-   }
+        'content': text,
+    }
     async with aiohttp.ClientSession() as session:
         async with session.post(api, json=query) as resp:
             response_text = await resp.text()
     end = time.time()
-    result.append({
-        'taskid': taskid,
-        'begin': begin,
-        'end': end,
-        'response_text': response_text
-    })
+    times.append(end-begin)
+    # result.append({
+    #     'taskid': taskid,
+    #     'begin': begin,
+    #     'end': end,
+    #     'response_text': response_text
+    # })
 
 
 
 async def main(args):
-    texts = args.texts
     tasks = set()
-    result = []
+    request_times = []
+    print('starting...')
     begin = time.time()
-    now = time.strftime('%Y-%m-%d_%H:%M:%S')
-
-    for i, text in enumerate(texts):
-        if args.num_query and args.num_query < i:
-            break
-        task_id = now + f'{i:012}'
-        task = asyncio.create_task(
-            test_coro(args.api_uri, task_id, text, result))
+    for i in args.texts:
+        task = asyncio.create_task(test_coro(args.api_uri, i, request_times))
         tasks.add(task)
         task.add_done_callback(tasks.discard)
-
-        if len(tasks) < args.concurrence:
+        if len(tasks) < args.num_concurrence:
             continue
-
-        if i % args.concurrence == 0:
-            print(f'{i=}, start {args.concurrence} '
-                  f'queries @ {time.strftime("%m-%d %H:%M:%S")}')
-
-        await asyncio.sleep(0.05)
-
-        while len(tasks) >= args.concurrence:
-            await asyncio.sleep(0.05)
-
+        print((f'{i=}, start {args.num_concurrence} '
+               f'queries @ {time.strftime("%m-%d %H:%M:%S")}'))
+        await asyncio.sleep(0.1)
+        while len(tasks) >= args.num_concurrence:
+            await asyncio.sleep(0.1)
     while tasks:
         await asyncio.sleep(0.1)
-
-    with open(f'{now}.log', 'w') as f:
-        json.dump(result, f, indent=2)
-
-    print('done', time.time() - begin)
+    request_time = time.time() - begin
+    concur_info = {
+        'request_time': request_time,
+    }
+    request_info = {
+        'mean': statistics.mean(request_times),
+        'median': statistics.median(request_times),
+        'max_time': max(request_times),
+        'min_time': min(request_times),
+    }
+    print('For all concurrence:')
+    print_result(concur_info)
+    print('For one request:')
+    print_result(request_info)
+    
+    print('done')
 
 
 if __name__ == '__main__':
     args = get_args()
     asyncio.run(main(args))
+
