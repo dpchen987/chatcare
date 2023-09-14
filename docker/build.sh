@@ -7,7 +7,12 @@ echo "version: $version"
 sh build_whl.sh
 
 # build hnswlib wheel for docker
-pip wheel hnswlib==0.7.0
+hnswlib_whl=hnswlib-0.7.0-cp38-cp38-linux_x86_64.whl
+if [ -f "$hnswlib_whl" ]; then
+  echo "has $hnswlib_whl"
+else
+  pip wheel hnswlib==0.7.0
+fi
 
 # copy all needs to current dir
 cp ../requirements.txt .
@@ -21,10 +26,10 @@ cat << EOF > Dockerfile
 FROM python:3.8-slim
 WORKDIR /app
 ENV TZ="Asia/Shanghai"
-COPY requirements.txt hnswlib-0.7.0-cp38-cp38-linux_x86_64.whl chatcare-$version-cp38-cp38-linux_x86_64.whl /app/
+COPY requirements.txt $hnswlib_whl chatcare-$version-cp38-cp38-linux_x86_64.whl /app/
 RUN pip install -i https://mirrors.aliyun.com/pypi/simple/ --no-cache-dir -r requirements.txt \
-    && pip install --no-cache-dir hnswlib-0.7.0-cp38-cp38-linux_x86_64.whl chatcare-$version-cp38-cp38-linux_x86_64.whl \
-    && rm hnswlib-0.7.0-cp38-cp38-linux_x86_64.whl chatcare-$version-cp38-cp38-linux_x86_64.whl
+    && pip install --no-cache-dir $hnswlib_whl chatcare-$version-cp38-cp38-linux_x86_64.whl \
+    && rm $hnswlib_whl chatcare-$version-cp38-cp38-linux_x86_64.whl
 
 COPY workspace /workspace
 
