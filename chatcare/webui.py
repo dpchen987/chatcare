@@ -87,6 +87,7 @@ def main():
 
     app.queue(concurrency_count=16).launch(
         # auth=("yixiaoai", "AI**yshy"),
+        root_path="/chatcare",
         server_name=params.webui_host,
         server_port=params.webui_port,
         share=True)
