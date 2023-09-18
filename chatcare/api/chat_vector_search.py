@@ -7,17 +7,18 @@ from chatcare.config import params
 from chatcare.chains.chain import chain
 
 
-async def chat_search_engine(query: str, history: List[List[str]] = None):
+async def chat_vector_search(query: str, history: List[List[str]] = None):
     time_start = time.time()
     content = chain(query)
-    content = content.strip()
+    if isinstance(content, str):
+        content = content.strip()
     if params.debug:
         logger.info(
-            f"Chat with search engine successfully! || Cost_time(s): {time.time() - time_start} || Query: {query} || Content: {content}")
+            f"Chat with vector search successfully! || Cost_time(s): {time.time() - time_start} || Query: {query} || Content: {content}")
     return content
 
 
-async def chat_search_engine_stream(query: str, history: List[List[str]] = None):
+async def chat_vector_search_stream(query: str, history: List[List[str]] = None):
     time_start = time.time()
     content = chain(query)
     content = content.strip()
@@ -25,10 +26,10 @@ async def chat_search_engine_stream(query: str, history: List[List[str]] = None)
         yield chunk
     if params.debug:
         logger.info(
-            f"Chat stream with search engine successfully! || Cost_time(s): {time.time() - time_start} || Query: {query} || Content: {content}")
+            f"Chat stream with vector search successfully! || Cost_time(s): {time.time() - time_start} || Query: {query} || Content: {content}")
 
 
 if __name__ == '__main__':
     query = "肺炎需要注意什么？"
-    content = chat_search_engine(query)
+    content = chat_vector_search(query)
     print(content)

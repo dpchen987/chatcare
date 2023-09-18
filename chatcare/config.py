@@ -8,8 +8,8 @@ from chatcare.utils.logger import logger
 params = Params(
     # api params
     host='0.0.0.0',
-    port=8000,
-    chat_mode='se',  # `se`：向量搜索 or `llm`：大模型 or `kb`：llm+知识库(待开发)
+    port=8001,
+    chat_mode='kb',  # `vs`：QA向量搜索 or `llm`：大模型 or `kb`：基于知识库多模态对话
     vector_db='hnsw',  # 选择向量搜索数据库 `milvus` or `hnsw`
     concurrency=10,
 
@@ -21,12 +21,12 @@ params = Params(
     bge_model_path='/workspace/models/bge-base-zh',
 
     # classification params
-    num_class=2,
+    num_class=26,
     embed_dim=768,
     classify_model_path='/workspace/models/embedding_classify.pt',
 
     # vector store: hnsw
-    hnsw_kb_init_jsonl="/workspace/knowledge_base/qa/example.jsonl",  # 初始化db的问答对
+    hnsw_kb_init_jsonl="/workspace/knowledge_base/qa/example_v1.2.jsonl",  # 初始化db的问答对
     hnsw_kb_index_file="/workspace/knowledge_base/db/kb_index.bin",
     hnsw_kb_text_file="/workspace/knowledge_base/db/kb_text.bin",
 

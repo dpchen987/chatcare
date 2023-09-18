@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from chatcare.utils.types import *
-from chatcare.utils import __version__
+from chatcare import __version__
 from chatcare.config import params
 from chatcare.api.chat_api import (
     list_models, chat_completions, chat_direct_with_llm,
@@ -62,9 +62,16 @@ def create_app():
     )(chat_completions)
 
     app.post(
-        "/v1/chat/search_engine",
+        "/v1/chat/knowledge_base",
         tags=["Chat"],
-        summary="(DEV) 直接与 Search Engine 对话",
+        summary="与知识库对话",
+        response_model=ChatKnowledgeBaseResponse
+    )(chat_with_knowledge_base)
+
+    app.post(
+        "/v1/chat/vector_search",
+        tags=["Chat"],
+        summary="(DEV) 直接与 QA vector searcher 对话",
         response_model=ChatCompletionResponse
     )(chat_direct_with_search_engine)
 
@@ -74,13 +81,6 @@ def create_app():
         summary="(DEV) 直接与 LLM 对话",
         response_model=ChatCompletionResponse
     )(chat_direct_with_llm)
-
-    app.post(
-        "/v1/chat/knowledge_base",
-        tags=["Chat"],
-        summary="(DEV) 与llm+知识库对话",
-        response_model=ChatCompletionResponse
-    )(chat_with_knowledge_base)
 
     # Tag: Knowledge Base Management
     app.get("/knowledge_base/list_knowledge_bases",

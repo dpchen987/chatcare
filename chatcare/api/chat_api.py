@@ -5,7 +5,7 @@ from fastapi.responses import StreamingResponse
 from chatcare.utils.types import *
 from chatcare.utils.logger import logger
 from chatcare.api.chat_llm import load_llm_model, chat_llm, chat_llm_stream
-from chatcare.api.chat_search_engine import chat_search_engine, chat_search_engine_stream
+from chatcare.api.chat_vector_search import chat_vector_search, chat_vector_search_stream
 from chatcare.config import params
 
 
@@ -18,7 +18,7 @@ async def list_models():
 
 async def chat_completions(request: ChatCompletionRequest) -> ChatCompletionResponse:
     """ChatCare对话接口"""
-    if params.chat_mode == "se":
+    if params.chat_mode == "vs":
         chat_completions_api = chat_direct_with_search_engine
     elif params.chat_mode == "llm":
         chat_completions_api = chat_direct_with_llm
@@ -37,7 +37,7 @@ async def chat_completions(request: ChatCompletionRequest) -> ChatCompletionResp
 
 
 async def chat_stream_search_engine_generator(query: str, history: List[List[str]] = None):
-    async for chunk in chat_search_engine_stream(query, history):
+    async for chunk in chat_vector_search_stream(query, history):
         choice_data = ChatCompletionResponseChoice(
             index=0,
             message=ChatMessage(role="assistant", content=chunk),
@@ -58,7 +58,7 @@ async def chat_direct_with_search_engine(request: ChatCompletionRequest):
     query = request.messages[-1].content
     if request.stream:
         return StreamingResponse(chat_stream_search_engine_generator(query), media_type="text/event-stream")
-    content = await chat_search_engine(query)
+    content = await chat_vector_search(query)
     choice_data = ChatCompletionResponseChoice(
         index=0,
         message=ChatMessage(role="assistant", content=content),
@@ -111,14 +111,17 @@ async def chat_direct_with_llm(request: ChatCompletionRequest):
     return ChatCompletionResponse(model=request.model, choices=[choice_data], object="chat.completion")
 
 
-async def chat_with_knowledge_base(request: ChatCompletionRequest):
+async def chat_with_knowledge_base(request: ChatKnowledgeBaseRequest):
     """
-    TODO
     chat_with_knowledge_base
     """
-    choice_data = ChatCompletionResponseChoice(
-        index=0,
-        message=ChatMessage(role="assistant", content="This API Has Not Implemented !!!"),
-        finish_reason="stop"
-    )
-    return ChatCompletionResponse(model=request.model, choices=[choice_data], object="chat.completion")
+    try:
+        query = request.messages[-1].content
+        content = await chat_vector_search(query, )
+        if isinstance(content, str):
+            content = {"提问错误": content}
+    except:
+        logger.exception('An error occurred in api: `chat_with_knowledge_base`!')
+        content = {"发生错误": "请再问我一次！"}
+
+    return ChatKnowledgeBaseResponse(content=content)

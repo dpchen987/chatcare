@@ -2,9 +2,9 @@
 import gradio as gr
 
 from chatcare.api.chat_llm import load_llm_model, chat_llm, chat_llm_stream
-from chatcare.api.chat_search_engine import chat_search_engine, chat_search_engine_stream
+from chatcare.api.chat_vector_search import chat_vector_search, chat_vector_search_stream
 from chatcare.config import params
-from chatcare.utils import __version__
+from chatcare import __version__
 
 
 async def chat_se_generator(query: str, chat_history: list, stream: bool = True):
@@ -13,13 +13,13 @@ async def chat_se_generator(query: str, chat_history: list, stream: bool = True)
     """
     if stream:
         content = ""
-        async for chunk in chat_search_engine_stream(query, None):
+        async for chunk in chat_vector_search_stream(query, None):
             content += chunk
             yield "", chat_history + [(query, content)]
         chat_history.append((query, content))
 
     else:
-        content = await chat_search_engine(query, None)
+        content = await chat_vector_search(query, None)
         chat_history.append((query, content))
         yield "", chat_history
 
@@ -69,9 +69,9 @@ def main():
                 )
                 dd_mode = gr.Dropdown(
                     label="选择对话模式：",
-                    choices=["向量搜索模式(se)", "大模型模式(llm)", "知识库模式(kb)"],
+                    choices=["向量搜索模式(vs)", "大模型模式(llm)", "知识库模式(kb)"],
                     type="index",
-                    value="向量搜索模式(se)"
+                    value="向量搜索模式(vs)"
                 )
                 btn_clear = gr.Button(value="🗑️清空对话")
                 # TODO

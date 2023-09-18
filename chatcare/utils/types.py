@@ -57,6 +57,14 @@ class ChatCompletionResponse(BaseModel):
     created: Optional[int] = Field(default_factory=lambda: int(time.time()))
 
 
+class ChatKnowledgeBaseRequest(BaseModel):
+    messages: List[ChatMessage]
+
+
+class ChatKnowledgeBaseResponse(BaseModel):
+    content: Dict = {}
+
+
 class BaseResponse(BaseModel):
     code: int = Field(200, description="HTTP status code")
     msg: str = Field("success", description="HTTP status message")
