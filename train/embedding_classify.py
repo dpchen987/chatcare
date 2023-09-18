@@ -20,7 +20,7 @@ zzz = {
     'large': 1024
 }
 embed_dim = zzz[msize]
-num_class = 2
+num_class = 26
 
 
 class EmbeddingDataset(Dataset):
@@ -63,6 +63,7 @@ def load_embedding(train_data_path):
 
 def train(train_data_path, test_data_path):
     embeds, labels = load_embedding(train_data_path)
+    print(labels)
     print(f'======= {embeds.shape = }, {len(labels) = }')
     vembeds, vlabels = load_embedding(test_data_path)
     print(f'------- {vembeds.shape = }, {len(vlabels) = }')
@@ -74,7 +75,7 @@ def train(train_data_path, test_data_path):
     assert embed_dim == embeds.shape[-1]
     assert num_class == len(set(labels))
     print(f'-- {embed_dim = }, {num_class = } ===================')
-    assert num_class == 2
+    assert num_class == 26
     lr = 0.0001
     momentum = 0.9
     model = EmbeddingClassification(embed_dim, num_class)
@@ -89,9 +90,11 @@ def train(train_data_path, test_data_path):
         steps = 2
 
         for i, data in enumerate(trainloader):
-            # print('============= one i:', i)
+            # print('============= one i:', i, data)
             inputs, labels = data
             # print(f'\t{inputs.shape = }, {labels.shape = }')
+            # print(f'\t{inputs = }, {labels = }')
+            inputs = inputs.to(torch.float32)
             optimizer.zero_grad()
             outputs = model(inputs)
             loss = loss_fn(outputs, labels)
@@ -118,6 +121,7 @@ def train(train_data_path, test_data_path):
         with torch.no_grad():
             for i, vdata in enumerate(validationloader):
                 vinputs, vlabels = vdata
+                vinputs = vinputs.to(torch.float32)
                 voutputs = model(vinputs)
                 vloss = loss_fn(voutputs, vlabels)
                 running_vloss += vloss
@@ -145,6 +149,8 @@ def infer(model_path):
     def infer_fn(text):
         embed = bge.encode_queries([text])
         embed = torch.tensor(embed)
+        embed = embed.to(torch.float32)
+        # print(embed)
         with torch.no_grad():
             ilabel = model(embed)
         return ilabel
@@ -158,7 +164,7 @@ def infer(model_path):
         label = t[0]
         text = t[1]
         ilabel = infer_fn(text)
-        print(ilabel)
+        # print(ilabel)
         ilabel = int(ilabel.argmax(dim=1)[0])
         if label != ilabel:
             print(f'{label = } != {ilabel = }', text)
