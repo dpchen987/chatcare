@@ -56,7 +56,7 @@ def update_params_from_env():
     """
     global params
     params.host = os.getenv('HOST', params.host)
-    params.port = os.getenv("PORT", params.port)
+    params.port = int(os.getenv("PORT", params.port))
     params.chat_mode = os.getenv("CHAT_MODE", params.chat_mode)
     params.debug = os.getenv("DEBUG", params.debug)
 
