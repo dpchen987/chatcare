@@ -18,6 +18,7 @@ def get_package_data():
     from glob import glob
     files = [
         'chatcare/chat.html',
+        'chatcare/login.html',
     ]
     new = []
     for f in files:
