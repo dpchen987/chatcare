@@ -7,11 +7,13 @@
 import os
 import torch
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Cookie, Response, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from contextlib import asynccontextmanager
+from typing_extensions import Annotated
+from typing import Union
 
 from chatcare.utils.types import *
 from chatcare import __version__
@@ -43,12 +45,32 @@ def create_app():
     app.mount("/static", StaticFiles(directory="/workspace/knowledge_base/"), name="static")
     pkg_dir = os.path.dirname(os.path.abspath(__file__))
     html_path = os.path.join(pkg_dir, 'chat.html')
+    login_path = os.path.join(pkg_dir, 'login.html')
 
     @app.get('/', response_class=HTMLResponse)
-    async def home():
+    async def home(user_id: Annotated[Union[str, None], Cookie()] = None):
+        print(f'{user_id = }')
+        if user_id != 'whoami':
+            return RedirectResponse('/login')
         with open(html_path) as f:
             html = f.read()
         return html
+
+    @app.get('/login', response_class=HTMLResponse)
+    async def login():
+        with open(login_path) as f:
+            html = f.read()
+        return html
+
+    @app.post('/login2')
+    async def loginpost(user: Annotated[str, Form()], password: Annotated[str, Form()]):
+        print(f'{user = }, {password = }')
+        if user == 'ailab' and password == 'cHat*&$AI':
+            resp = RedirectResponse('/', status_code=303)
+            resp.set_cookie(key="user_id", value="whoami")
+            return resp
+        return RedirectResponse('/login')
+
     # 跨域
     app.add_middleware(
         CORSMiddleware,
