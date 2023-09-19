@@ -20,7 +20,7 @@ zzz = {
     'large': 1024
 }
 embed_dim = zzz[msize]
-num_class = 26
+num_class = 25
 
 
 class EmbeddingDataset(Dataset):
@@ -42,15 +42,18 @@ def load_embedding(train_data_path):
     import os
     import pickle
     embed_path = train_data_path + '.pkl'
+    # if os.path.exists(embed_path):
     if os.path.exists(embed_path):
-        with open(embed_path, 'rb') as f:
-            dd = pickle.load(f)
-        return dd['embeds'], dd['labels']
+        os.remove(embed_path)
+        # with open(embed_path, 'rb') as f:
+        #     dd = pickle.load(f)
+        # return dd['embeds'], dd['labels']
     labels = []
     texts = []
     with open(train_data_path, 'r') as f:
         for l in f:
             zz = l.strip().split(' ', 1)
+            # print(zz)
             assert len(zz) == 2
             labels.append(int(zz[0]))
             texts.append(zz[1])
@@ -75,7 +78,7 @@ def train(train_data_path, test_data_path):
     assert embed_dim == embeds.shape[-1]
     assert num_class == len(set(labels))
     print(f'-- {embed_dim = }, {num_class = } ===================')
-    assert num_class == 26
+    assert num_class == 25
     lr = 0.0001
     momentum = 0.9
     model = EmbeddingClassification(embed_dim, num_class)

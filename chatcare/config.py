@@ -21,7 +21,7 @@ params = Params(
     bge_model_path='/workspace/models/bge-base-zh',
 
     # classification params
-    num_class=26,
+    num_class=25,
     embed_dim=768,
     classify_model_path='/workspace/models/embedding_classify.pt',
 
