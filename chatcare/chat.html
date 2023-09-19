@@ -302,7 +302,7 @@ body {
       };
       console.log(JSON.stringify(data));
       $.ajax({
-        url: "http://192.168.10.10:8000/v1/chat/knowledge_base",
+        url: "/v1/chat/knowledge_base",
         method: "POST",
         data: JSON.stringify(data),
         contentType: 'application/json; charset=utf-8',
