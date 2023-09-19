@@ -21,7 +21,7 @@ class ModelList(BaseModel):
 
 class ChatMessage(BaseModel):
     role: Literal["user", "assistant", "system"]
-    content: str = "上海颐家是什么?"
+    content: str = "腰椎间盘突出没做手术如何护理?"
 
 
 class DeltaMessage(BaseModel):

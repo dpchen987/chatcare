@@ -8,7 +8,7 @@ from chatcare.utils.logger import logger
 params = Params(
     # api params
     host='0.0.0.0',
-    port=8001,
+    port=8000,
     chat_mode='kb',  # `vs`：QA向量搜索 or `llm`：大模型 or `kb`：基于知识库多模态对话
     vector_db='hnsw',  # 选择向量搜索数据库 `milvus` or `hnsw`
     concurrency=10,

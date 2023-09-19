@@ -119,9 +119,15 @@ async def chat_with_knowledge_base(request: ChatKnowledgeBaseRequest):
         query = request.messages[-1].content
         content = await chat_vector_search(query, )
         if isinstance(content, str):
-            content = {"提问错误": content}
+            content = {
+                'summary': f'您的提问异常：{query}，请问我护理相关问题！',
+                'details': [{"提问异常": content}]
+            }
     except:
         logger.exception('An error occurred in api: `chat_with_knowledge_base`!')
-        content = {"发生错误": "请再问我一次！"}
+        content = {
+            'summary': f'发生错误，请再问我一次！',
+            'details': [{'发生错误': '请再问我一次！'}]
+        }
 
     return ChatKnowledgeBaseResponse(content=content)
