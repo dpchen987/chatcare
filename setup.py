@@ -16,12 +16,9 @@ pkg_name = 'chatcare'
 
 def get_package_data():
     from glob import glob
-    files = []
-    files += glob('chatcare/utils/*')
-    files += glob('chatcare/api/*')
-    files += glob('chatcare/llms/*')
-    files += glob('chatcare/embeddings/*')
-    files += glob('chatcare/chains/*')
+    files = [
+        'chatcare/chat.html',
+    ]
     new = []
     for f in files:
         p = f.find('/')
@@ -101,7 +98,7 @@ def main(use_cython=False):
                 'chatcare=chatcare.webapi:run_api',
             ]
         },
-        # package_data={pkg_name: get_package_data()},
+        package_data={pkg_name: get_package_data()},
         # include_package_data=True,
         # cmdclass={
         #     'build_py': build_py

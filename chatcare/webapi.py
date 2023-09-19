@@ -4,10 +4,13 @@
 # code ref: https://github.com/QwenLM/Qwen-7B/blob/main/openai_api.py
 # Visit http://localhost:8000/docs (default) for documents.
 
+import os
 import torch
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
 from contextlib import asynccontextmanager
 
 from chatcare.utils.types import *
@@ -37,6 +40,15 @@ def create_app():
         version=__version__,
         lifespan=lifespan,
     )
+    app.mount("/static", StaticFiles(directory="/workspace/knowledge_base/"), name="static")
+    pkg_dir = os.path.dirname(os.path.abspath(__file__))
+    html_path = os.path.join(pkg_dir, 'chat.html')
+
+    @app.get('/', response_class=HTMLResponse)
+    async def home():
+        with open(html_path) as f:
+            html = f.read()
+        return html
     # 跨域
     app.add_middleware(
         CORSMiddleware,
