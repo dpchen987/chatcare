@@ -75,6 +75,7 @@ def chain(query):
     global kbs_hnsw
     embedding = bge.encode_queries([query])
     label = classify(embedding)
+    logger.info(f'{query = }, label = {KB_LABEL_LIST[label]}')
     if label == 0:
         return '超出我的知识范围，请询问护理相关的问题'
 
