@@ -62,7 +62,9 @@ class ChatKnowledgeBaseRequest(BaseModel):
 
 
 class ChatKnowledgeBaseResponse(BaseModel):
-    content: Dict = {}
+    error: int = 0
+    summary: str = ''
+    details: List[Union[Dict]] = []
 
 
 class BaseResponse(BaseModel):
