@@ -45,7 +45,7 @@ docker build -t chatcare:$version .
 #     docker container prune
 
 # save docker image, give it to IT guys for deploying
-docker save -o image-chatcare-$version-`date "+%Y-%m-%d_%H:%M:%S"`.tar chatcare:$version
+docker save -o image-chatcare-$version-`date "+%Y-%m-%d_%H.%M.%S"`.tar chatcare:$version
 
 # clear
 rm chatcare-$version-cp*-cp*-linux_x86_64.whl
