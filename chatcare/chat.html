@@ -271,9 +271,12 @@ video {
 (function () {
   // $('#myModal').modal('hide');
   $('#myModal').modal({
-        show: false
-    }).on('hidden.bs.modal', function(){
-        $(this).find('video')[0].pause();
+    show: false
+  }).on('hidden.bs.modal', function(){
+      var videos = $(this).find('video');
+      if (videos.length > 0) {
+        videos[0].pause();
+      }
     });
   var Message;
   Message = function (arg) {
@@ -301,6 +304,7 @@ video {
     if(relUrl.indexOf("?") != -1){
       relUrl = relUrl.split("?")[0];
     }
+    relUrl = relUrl.replaceAll('#', '')
     return relUrl;
   }
   $(function () {
