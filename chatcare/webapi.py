@@ -71,6 +71,12 @@ def create_app():
             return resp
         return RedirectResponse('/login')
 
+    @app.get('/logout')
+    async def logout():
+        resp = RedirectResponse('/login', status_code=303)
+        resp.delete_cookie('user_id')
+        return resp
+
     # 跨域
     app.add_middleware(
         CORSMiddleware,
