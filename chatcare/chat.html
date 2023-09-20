@@ -291,6 +291,18 @@ video {
     }(this);
     return this;
   };
+  function GetUrlRelativePath(){
+    var url = document.location.toString();
+    var arrUrl = url.split("//");
+
+    var start = arrUrl[1].indexOf("/");
+    var relUrl = arrUrl[1].substring(start);//stop省略，截取从start开始到结尾的所有字符
+
+    if(relUrl.indexOf("?") != -1){
+      relUrl = relUrl.split("?")[0];
+    }
+    return relUrl;
+  }
   $(function () {
     var getMessageText, message_side, sendMessage;
     message_side = 'right';
@@ -320,9 +332,10 @@ video {
       var data = {
         messages: [{role: 'user', 'content': text}]
       };
+      var path = GetUrlRelativePath();
       console.log(JSON.stringify(data));
       $.ajax({
-        url: "/v1/chat/knowledge_base",
+        url: "./v1/chat/knowledge_base",
         method: "POST",
         data: JSON.stringify(data),
         contentType: 'application/json; charset=utf-8',
@@ -338,12 +351,14 @@ video {
               index++;
               var data = v.content;
               if (v.images) {
-                for (const img of v.images) {
+                for (var img of v.images) {
+                  if (path != '/') img = path + img;
                   data += '<br>' + "<img src='" + img.replaceAll('.jpg', '.png') + "'>";
                 }
               }
               if (v.videos) {
-                for (const vid of v.videos) {
+                for (var vid of v.videos) {
+                  if (path != '/') vid = path + vid;
                   data += '<br>' + "<video src='" + vid + "' controls>您的浏览器不支持视频标签</video>";
                 }
               }

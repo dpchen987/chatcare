@@ -7,7 +7,7 @@
 import os
 import torch
 import uvicorn
-from fastapi import FastAPI, Cookie, Response, Form
+from fastapi import FastAPI, Cookie, Request, Response, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -41,17 +41,25 @@ def create_app():
         title="ChatCare API Server",
         version=__version__,
         lifespan=lifespan,
+        root_path=params.root_path,
     )
     app.mount("/static", StaticFiles(directory="/workspace/knowledge_base/"), name="static")
     pkg_dir = os.path.dirname(os.path.abspath(__file__))
     html_path = os.path.join(pkg_dir, 'chat.html')
     login_path = os.path.join(pkg_dir, 'login.html')
+    root_path = params.root_path
+
+    @app.get('/root_path')
+    async def get_rp(request: Request):
+        return {'root_path': request.scope.get('root_path')}
 
     @app.get('/', response_class=HTMLResponse)
     async def home(user_id: Annotated[Union[str, None], Cookie()] = None):
         print(f'{user_id = }')
         if user_id != 'whoami':
-            return RedirectResponse('/login')
+            rd = '/login' if not root_path else f'/{root_path}/login'
+            print(f'{rd = }')
+            return RedirectResponse(rd, status_code=303)
         with open(html_path) as f:
             html = f.read()
         return html
@@ -66,14 +74,17 @@ def create_app():
     async def loginpost(user: Annotated[str, Form()], password: Annotated[str, Form()]):
         print(f'{user = }, {password = }')
         if user == 'ailab' and password == 'cHat*&$AI':
-            resp = RedirectResponse('/', status_code=303)
+            rd = '/' if not root_path else f'/{root_path}/'
+            resp = RedirectResponse(rd, status_code=303)
             resp.set_cookie(key="user_id", value="whoami")
             return resp
-        return RedirectResponse('/login')
+        rd = '/login' if not root_path else f'/{root_path}/login'
+        return RedirectResponse(rd, status_code=303)
 
     @app.get('/logout')
     async def logout():
-        resp = RedirectResponse('/login', status_code=303)
+        rd = '/login' if not root_path else f'/{root_path}/login'
+        resp = RedirectResponse(rd, status_code=303)
         resp.delete_cookie('user_id')
         return resp
 
