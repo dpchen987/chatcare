@@ -285,11 +285,60 @@ video {
       return function () {
         var $message;
         $message = $($('.message_template').clone().html());
-        $message.addClass(_this.message_side).find('.text').html(_this.text);
+        $message.addClass(_this.message_side).find('.text').html('');
         $('.messages').append($message);
-        return setTimeout(function () {
-          return $message.addClass('appeared');
-        }, 0);
+        // return setTimeout(function () {
+        //   return $message.addClass('appeared');
+        // }, 0);
+        $message.addClass('appeared');
+        var slices = [];
+        var div_text = $message.find('.text');
+        var in_tag = false;
+        var in_quots = false;
+        var tag = '';
+        // console.log(_this.text);
+        for (let i=0; i<_this.text.length; i++) {
+          if (_this.text[i] == '"') in_quots = !in_quots;
+          if (_this.text[i] == '<' && !in_quots) {
+            in_tag = true;
+            tag = '<';
+            continue;
+            }
+          if (_this.text[i] == '>' && !in_quots) {
+            in_tag = false;
+            tag += '>';
+            slices.push(tag);
+            tag = '';
+            continue;
+          }
+          if (in_tag) {
+            tag += _this.text[i];
+            continue
+          }
+          slices.push(_this.text[i]);
+        }
+        // console.log(slices);
+        var j = 0;
+        var html = '';
+        var messages = $('.messages');
+        var coding = setInterval(function() {
+          html += slices[j];
+          div_text.html(html);
+          j++;
+          if (j % 10 == 0) {
+            messages.scrollTop(messages.prop('scrollHeight'));
+          }
+          if (j >= slices.length) {
+            clearInterval(coding);
+            $(".check_details").click(function() {
+              messages.scrollTop(messages.prop('scrollHeight'));
+              var data = $(this).attr('data');
+              $("#myModalLabel").text($(this).text());
+              $("#myModalBody").html(data);
+              $("#myModal").modal('show');
+            });
+          }
+        }, 20);
       };
     }(this);
     return this;
