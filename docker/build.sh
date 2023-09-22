@@ -14,7 +14,7 @@ else
   pip wheel hnswlib==0.7.0
 fi
 
-# copy all needs to current dir
+# generate local workspace
 cp ../requirements.txt .
 mkdir -p ./workspace/models/
 cp -rL /workspace/knowledge_base ./workspace/
@@ -30,8 +30,6 @@ COPY requirements.txt $hnswlib_whl chatcare-$version-cp38-cp38-linux_x86_64.whl 
 RUN pip install -i https://mirrors.aliyun.com/pypi/simple/ --no-cache-dir -r requirements.txt \
     && pip install --no-cache-dir $hnswlib_whl chatcare-$version-cp38-cp38-linux_x86_64.whl \
     && rm $hnswlib_whl chatcare-$version-cp38-cp38-linux_x86_64.whl
-
-COPY workspace /workspace
 
 CMD [ "chatcare"]
 EOF
@@ -50,4 +48,4 @@ docker save -o image-chatcare-$version-`date "+%Y-%m-%d_%H.%M.%S"`.tar chatcare:
 # clear
 rm chatcare-$version-cp*-cp*-linux_x86_64.whl
 rm requirements.txt
-rm -rf workspace
+# rm -rf workspace
