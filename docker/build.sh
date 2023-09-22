@@ -16,10 +16,10 @@ fi
 
 # generate local workspace
 cp ../requirements.txt .
-mkdir -p ./workspace/models/
-cp -rL /workspace/knowledge_base ./workspace/
-cp -rL /workspace/models/bge-base-zh ./workspace/models/
-cp -r /workspace/models/embedding_classify.pt ./workspace/models
+# mkdir -p ./workspace/models/
+# cp -rL /workspace/knowledge_base ./workspace/
+# cp -rL /workspace/models/bge-base-zh ./workspace/models/
+# cp -r /workspace/models/embedding_classify.pt ./workspace/models
 
 # generate Docerfile
 cat << EOF > Dockerfile
