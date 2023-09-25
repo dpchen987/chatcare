@@ -27,7 +27,7 @@ params = Params(
     classify_model_path='/workspace/models/embedding_classify.pt',
 
     # vector store: hnsw
-    hnsw_kb_init_jsonl="/workspace/knowledge_base/qa/example_v1.2.jsonl",  # 初始化db的问答对
+    hnsw_kb_init_jsonl="/workspace/knowledge_base/qa/example_v1.2.2.jsonl",  # 初始化db的问答对
     hnsw_kb_index_file="/workspace/knowledge_base/db/kb_index.bin",
     hnsw_kb_text_file="/workspace/knowledge_base/db/kb_text.bin",
 
