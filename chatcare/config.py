@@ -12,6 +12,7 @@ params = Params(
     chat_mode='kb',  # `vs`：QA向量搜索 or `llm`：大模型 or `kb`：基于知识库多模态对话
     vector_db='hnsw',  # 选择向量搜索数据库 `milvus` or `hnsw`
     concurrency=10,
+    root_path='',
 
     # webui params
     webui_host='0.0.0.0',
@@ -59,6 +60,7 @@ def update_params_from_env():
     params.port = int(os.getenv("PORT", params.port))
     params.chat_mode = os.getenv("CHAT_MODE", params.chat_mode)
     params.debug = os.getenv("DEBUG", params.debug)
+    params.root_path = os.getenv("ROOT_PATH", params.root_path)
 
 
 update_params_from_env()

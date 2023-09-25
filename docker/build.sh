@@ -14,12 +14,12 @@ else
   pip wheel hnswlib==0.7.0
 fi
 
-# copy all needs to current dir
+# generate local workspace
 cp ../requirements.txt .
-mkdir -p ./workspace/models/
-cp -rL /workspace/knowledge_base ./workspace/
-cp -rL /workspace/models/bge-base-zh ./workspace/models/
-cp -r /workspace/models/embedding_classify.pt ./workspace/models
+# mkdir -p ./workspace/models/
+# cp -rL /workspace/knowledge_base ./workspace/
+# cp -rL /workspace/models/bge-base-zh ./workspace/models/
+# cp -r /workspace/models/embedding_classify.pt ./workspace/models
 
 # generate Docerfile
 cat << EOF > Dockerfile
@@ -30,8 +30,6 @@ COPY requirements.txt $hnswlib_whl chatcare-$version-cp38-cp38-linux_x86_64.whl 
 RUN pip install -i https://mirrors.aliyun.com/pypi/simple/ --no-cache-dir -r requirements.txt \
     && pip install --no-cache-dir $hnswlib_whl chatcare-$version-cp38-cp38-linux_x86_64.whl \
     && rm $hnswlib_whl chatcare-$version-cp38-cp38-linux_x86_64.whl
-
-COPY workspace /workspace
 
 CMD [ "chatcare"]
 EOF
@@ -45,9 +43,9 @@ docker build -t chatcare:$version .
 #     docker container prune
 
 # save docker image, give it to IT guys for deploying
-docker save -o image-chatcare-$version-`date "+%Y-%m-%d_%H:%M:%S"`.tar chatcare:$version
+docker save -o image-chatcare-$version-`date "+%Y-%m-%d_%H.%M.%S"`.tar chatcare:$version
 
 # clear
 rm chatcare-$version-cp*-cp*-linux_x86_64.whl
 rm requirements.txt
-rm -rf workspace
+# rm -rf workspace

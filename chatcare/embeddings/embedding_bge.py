@@ -10,6 +10,7 @@ def get_bge(msize):
     bge = FlagModel(
         model_path,
         query_instruction_for_retrieval="为这个句子生成表示以用于检索相关文章：",
+        use_fp16=False,
     )
     return bge
 
