@@ -99,7 +99,7 @@ def main(use_cython=False):
                 'chatcare=chatcare.webapi:run_api',
             ]
         },
-        package_data={pkg_name: get_package_data()},
+        # package_data={pkg_name: get_package_data()},
         # include_package_data=True,
         # cmdclass={
         #     'build_py': build_py
