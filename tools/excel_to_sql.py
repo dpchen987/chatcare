@@ -14,7 +14,7 @@ def connect_db():
 
 def delete_db(engine, db_name):
     with engine.connect() as connection:
-        connection.execute(f"DELETE FROM {db_name}")
+        connection.execute(f"TRUNCATE TABLE {db_name}")
 
 def excel_df(file_path):
     sheet1_df = pd.read_excel(file_path, sheet_name='病种')
