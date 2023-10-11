@@ -22,9 +22,13 @@ params = Params(
     bge_model_path='/workspace/models/bge-base-zh',
 
     # classification params
-    num_class=26,
     embed_dim=768,
+    # cf1
+    num_class=26,
     classify_model_path='/workspace/models/embedding_classify.pt',
+    # cf2
+    num_class_intention=3,
+    classify_intention_path='/workspace/models/intention_classify.pt',
 
     # vector store: hnsw
     hnsw_kb_init_jsonl="/workspace/knowledge_base/qa/example_v1.2.2.jsonl",  # 初始化db的问答对
