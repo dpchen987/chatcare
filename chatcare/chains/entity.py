@@ -28,7 +28,7 @@ def _init_entity(json_file='entity.json'):
 entity, entity_searcher = _init_entity()
 
 
-def search_entity(word: str, entity_searcher: dict) -> list:
+def search_entity(word: str, entity_searcher: dict) -> dict:
     """
     查寻
 
@@ -36,13 +36,11 @@ def search_entity(word: str, entity_searcher: dict) -> list:
         word:
         entity_searcher:
     Return:
-        idx (int): df_entity index
+        entity (dict): entity or None
     """
-    entities = []
     for search_word in entity_searcher:
-        if word in search_word:
-            entities.append(entity_searcher[search_word])
-    return entities
+        if word == search_word:
+            return entity_searcher[search_word]
 
 
 def query_entity(query: str) -> list:
@@ -57,12 +55,13 @@ def query_entity(query: str) -> list:
     seg_list = jieba.cut(query, cut_all=False)
     entities = []
     for seg in seg_list:
-        entities.extend(search_entity(seg, entity_searcher))
+        entity = search_entity(seg, entity_searcher)
+        entities.append(entity) if entity else None
     entities = [eval(entity) for entity in set([str(entity) for entity in entities])]
     return entities
 
 
 if __name__ == '__main__':
-    query = '骨折了怎么办？'
+    query = '手腕骨折过，做了石膏固定，怎么护理？'
     entities = query_entity(query)
     print(entities)
