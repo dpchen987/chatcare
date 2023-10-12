@@ -9,10 +9,10 @@ from chatcare.llms.chatglm2_6b import load_model, infer
 from chatcare.utils.logger import logger
 
 
-def load_excel(excel_file: str) -> pd.DataFrame:
-    df = pd.read_excel(excel_file, sheet_name='病种')
+def load_excel(excel_file: str) -> tuple:
+    df_dict = pd.read_excel(excel_file, sheet_name=['病种', '操作'])
     logger.info(f"Load excel file from --> {os.path.abspath(excel_file)}")
-    return df
+    return df_dict['病种'], df_dict['操作']
 
 
 def extract_ill_label(df, entity):
@@ -60,7 +60,7 @@ def extract_ill_name(df, entity):
     return entity
 
 
-def extract_care_method(df, entity):
+def extract_treat_method(df, entity):
     """抽取 `治疗方案` """
     df_sub = df[['治疗方式']].copy()
     df_sub.dropna(inplace=True)
@@ -78,6 +78,21 @@ def extract_care_method(df, entity):
                     'children': [],
                 }
             )
+    return entity
+
+
+def extract_care_method(df, entity):
+    """抽取 操作名称 """
+    df_sub = df[['名称']].copy()
+    for item in df_sub['名称'].drop_duplicates().dropna().tolist():
+        entity.append(
+            {
+                'name': item,
+                'type': '操作名称',
+                'synonym': [],
+                'children': [],
+            }
+        )
     return entity
 
 
@@ -105,10 +120,11 @@ def synonym_plus(entity):
 
 def run(excel_file, json_file='entity.json', is_synonym_plus=False):
     entity = []
-    df = load_excel(excel_file)
-    extract_ill_name(df, entity)
-    extract_ill_label(df, entity)
-    extract_care_method(df, entity)
+    df_ill_kind, df_care_method = load_excel(excel_file)
+    extract_ill_name(df_ill_kind, entity)
+    extract_ill_label(df_ill_kind, entity)
+    extract_treat_method(df_ill_kind, entity)
+    extract_care_method(df_care_method, entity)
     if is_synonym_plus:
         synonym_plus(entity)
     json.dump(entity, open(json_file, 'w', encoding='utf-8'), ensure_ascii=False, indent=4)

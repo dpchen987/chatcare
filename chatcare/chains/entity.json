@@ -9,8 +9,8 @@
         "name": "桡骨远端骨折",
         "type": "疾病名称",
         "synonym": [
-            "小臂骨折",
             "手腕骨折",
+            "小臂骨折",
             "手部骨折"
         ],
         "children": [
@@ -26,9 +26,9 @@
         "name": "股骨颈骨折",
         "type": "疾病名称",
         "synonym": [
+            "大腿骨折",
             "腿部骨折",
-            "胯骨折",
-            "大腿骨折"
+            "胯骨折"
         ],
         "children": [
             "非手术治疗",
@@ -102,8 +102,8 @@
         "type": "疾病类别",
         "synonym": [],
         "children": [
-            "腰椎间盘突出症",
-            "认知障碍症"
+            "认知障碍症",
+            "腰椎间盘突出症"
         ]
     },
     {
@@ -119,9 +119,9 @@
         "type": "疾病类别",
         "synonym": [],
         "children": [
-            "股骨颈骨折",
+            "桡骨远端骨折",
             "肱骨近端骨折",
-            "桡骨远端骨折"
+            "股骨颈骨折"
         ]
     },
     {
@@ -373,6 +373,204 @@
             "椎板切除髓核摘除术",
             "微创椎间盘摘除术"
         ],
+        "children": []
+    },
+    {
+        "name": "小心搬运",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "非手术体位护理",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "牵引护理",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "肢体活动和轻度康复训练",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "手术后体位护理",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "培养患者坚持功能锻炼的意识",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "预防关节脱位",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "定期观察及复诊",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "食物选择",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "保证营养摄入",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "日常观察患者骨折的恢复情况",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "体位护理与局部制动",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "保守治疗下手指和手臂肌肉功能锻炼",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "心理健康及康复意识",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "注意骨筋膜室综合征的发生",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "卧床休息",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "有效镇痛",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "正确佩戴腰围",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "肢体功能锻炼",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "预防复发及并发症",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "体位护理",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "加强营养",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "减少环境及相关刺激",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "观察和肢体语言交流",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "老人幻觉处理",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "老人用药管理",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "日常认知康复",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "被害妄想处理",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "被盗妄想处理",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "血糖监测",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "攻击等暴力行为处理",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "保守治疗体位护理",
+        "type": "操作名称",
+        "synonym": [],
+        "children": []
+    },
+    {
+        "name": "术后体位护理",
+        "type": "操作名称",
+        "synonym": [],
         "children": []
     }
 ]
