@@ -62,6 +62,14 @@ def query_entity(query: str) -> list:
 
 
 if __name__ == '__main__':
-    query = '手腕骨折过，做了石膏固定，怎么护理？'
-    entities = query_entity(query)
-    print(entities)
+    from pprint import pprint
+    queries = [
+        '手腕骨折过，做了石膏固定，怎么护理？',
+        '骨折如何护理',
+        '如何进行血糖监测',
+    ]
+    for query in queries:
+        entities = query_entity(query)
+        print(f'{query = }')
+        pprint(entities)
+        print('====='*10)
