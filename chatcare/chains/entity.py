@@ -40,7 +40,7 @@ def search_entity(word: str, entity_searcher: dict) -> list:
     """
     entities = []
     for search_word in entity_searcher:
-        if word in search_word:
+        if word == search_word:
             entities.append(entity_searcher[search_word])
     return entities
 
