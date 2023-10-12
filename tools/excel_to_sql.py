@@ -14,7 +14,7 @@ def connect_db():
 
 def delete_db(engine, db_name):
     with engine.connect() as connection:
-        connection.execute(f"TRUNCATE TABLE {db_name}")
+        connection.execute(f"DELETE FROM {db_name}")
 
 def excel_df(file_path):
     sheet1_df = pd.read_excel(file_path, sheet_name='病种')
@@ -35,6 +35,7 @@ def excel_df(file_path):
     df2['text'] = sheet2_df['描述']
     df2['image_link'] = sheet2_df['图片']
     df2['video_link'] = sheet2_df['视频']
+    df2['operation_id'] = sheet2_df['序号']
 
     df1.fillna('None', inplace=True)
     df2.fillna('None', inplace=True)
@@ -46,12 +47,14 @@ def excel_df(file_path):
 if __name__ == '__main__':
     import sys
     file_path = sys.argv[1]
+    db1_name = 'care_disease'
+    db2_name = 'care_operation'
     # file_path = '护理AI地图 2.0.xlsx'
 
     engine = connect_db()
-    delete_db(engine, 'care_disease')
-    delete_db(engine, 'care_operation')
+    delete_db(engine, db1_name)
+    delete_db(engine, db2_name)
     df1, df2 = excel_df(file_path)
-    df1.to_sql(name='care_disease', con=engine, if_exists='append', index=False)
-    df2.to_sql(name='care_operation', con=engine, if_exists='append', index=False)
+    df1.to_sql(name=db1_name, con=engine, if_exists='append', index=False)
+    df2.to_sql(name=db2_name, con=engine, if_exists='append', index=False)
 
