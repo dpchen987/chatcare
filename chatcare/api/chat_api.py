@@ -1,5 +1,5 @@
 # coding=utf-8
-from fastapi import HTTPException
+from fastapi import HTTPException, Request, Response
 from fastapi.responses import StreamingResponse
 
 from chatcare.utils.types import *
@@ -111,14 +111,19 @@ async def chat_direct_with_llm(request: ChatCompletionRequest):
     return ChatCompletionResponse(model=request.model, choices=[choice_data], object="chat.completion")
 
 
-async def chat_with_knowledge_base(request: ChatKnowledgeBaseRequest):
+async def chat_with_knowledge_base(request: Request, chat_request: ChatKnowledgeBaseRequest):
     """
     chat_with_knowledge_base
     """
     response_chat_with_knowledge_base = ChatKnowledgeBaseResponse()
     try:
-        query = request.messages[-1].content
-        answer = await chat_vector_search(query, )
+        chat_id = request.cookies['chat_id']
+        chat_request.chat_id = chat_id
+        response_chat_with_knowledge_base.chat_id = chat_id
+        query = chat_request.messages[-1].content
+        # Todo 根据chat_id拉取history
+        history = None
+        answer = await chat_vector_search(query, history)
         if isinstance(answer, Dict):
             response_chat_with_knowledge_base.summary = answer['summary']
             response_chat_with_knowledge_base.details = answer['details']
