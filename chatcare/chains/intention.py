@@ -14,3 +14,6 @@ intentions = {
         'slots': ['操作名称']
     }
 }
+
+for k, v in intentions.items():
+    v['slots'].sort

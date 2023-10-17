@@ -2,7 +2,8 @@ import json
 import jieba
 
 
-def _init_entity(json_file='entity.json'):
+def _init_entity():
+    json_file = '/workspace/knowledge_base/qa/entity.json'
     # 1. load entity
     entity = json.load(open(json_file, 'r', encoding='utf-8'))
     entity_searcher = {}
