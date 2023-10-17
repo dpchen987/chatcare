@@ -98,7 +98,7 @@ def chain(query, chat_id):
                 'summary': msg,
                 'hints': hints,
                 'details': []
-            }
+            }, chat_id
         # slots is full, to get answer
         msg, details = search_mysql(intent_id, intent_entities)
         result = {
@@ -106,7 +106,7 @@ def chain(query, chat_id):
             'hints': [],
             'details': details,
         }
-        return result
+        return result, chat_id
     # no entities
     embedding = bge.encode_queries([query])
     intent_id = classify(embedding)
@@ -115,7 +115,7 @@ def chain(query, chat_id):
             'summary': '超出我的知识范围，请询问护理相关的问题',
             'hints': [],
             'details': [],
-        }
+        }, chat_id
     # right intent but no entities
     if intent_id == 1:
         msg = '请问老人患的是哪种病？'
@@ -125,13 +125,13 @@ def chain(query, chat_id):
         'summary': msg,
         'hints': [],
         'details': []
-    }
+    }, chat_id
 
 
 if __name__ == "__main__":
     from pprint import pprint
     query = '骨折如何照护'
     while 1:
-        answer = chain(query, chat_id='abc')
-        print(f'{answer = }')
+        answer, chat_id = chain(query, chat_id='abc')
+        print(f'{chat_id = }, {answer = }')
         query = input('>')
