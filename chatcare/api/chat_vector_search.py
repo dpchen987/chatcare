@@ -5,7 +5,18 @@ from chatcare.utils.types import *
 from chatcare.utils.logger import logger
 from chatcare.config import params
 from chatcare.chains.chain import chain
+from chatcare.chains import chain_multi_turn
 
+
+async def chat_multi_turn(query: str, history: List[List[str]] = None):
+    time_start = time.time()
+    content = chain_multi_turn.chain(query)
+    if isinstance(content, str):
+        content = content.strip()
+    if params.debug:
+        logger.info(
+            f"Chat with vector search successfully! || Cost_time(s): {time.time() - time_start} || Query: {query} || Content: {content}")
+    return content
 
 async def chat_vector_search(query: str, history: List[List[str]] = None):
     time_start = time.time()

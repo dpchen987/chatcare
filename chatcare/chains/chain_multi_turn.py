@@ -4,9 +4,9 @@ from chatcare.chains.intention_classify import classify
 from chatcare.utils.chat_cache import MemCache
 from chatcare.utils.logger import logger
 
-from .entity import query_entity
-from .intention import intentions
-from .kb_search_mysql import search_mysql
+from chatcare.chains.entity import query_entity
+from chatcare.chains.intention import intentions
+from chatcare.chains.kb_search_mysql import search_mysql
 
 CHAT_CACHE = MemCache()
 
