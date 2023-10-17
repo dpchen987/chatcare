@@ -24,6 +24,7 @@ def excel_df(file_path):
     cols = sheet1_df.columns
     df1['disease'] = sheet1_df['疾病名称']
     df1['treatment'] = sheet1_df['治疗方式']
+    df1['preface'] = sheet1_df['开场白']
     df1['status'] = sheet1_df['预后情况']
     df1['solutions'] = sheet1_df['护理方案']
     if '饮食' in cols:
