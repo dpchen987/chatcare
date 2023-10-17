@@ -62,22 +62,27 @@ def extract_ill_name(df, entity):
 
 def extract_treat_method(df, entity):
     """抽取 `治疗方案` """
-    df_sub = df[['治疗方式']].copy()
+    df_sub = df[['治疗方式', '相关词']].copy()
     df_sub.dropna(inplace=True)
     df_sub.drop_duplicates(inplace=True)
+    entity_synonym = {}
     for idx, df_item in df_sub.iterrows():
         care_methods = df_item['治疗方式']
-        care_methods = re.findall(r'[\u4e00-\u9fa5]+', care_methods)
-        for i, method in enumerate(care_methods):
-            synonym = care_methods[:i] + care_methods[i + 1:]
-            entity.append(
-                {
-                    'name': method,
-                    'type': '治疗方式',
-                    'synonym': synonym,
-                    'children': [],
-                }
-            )
+        related = df_item['相关词']
+        synonym = re.findall(r'[\u4e00-\u9fa5]+', related)
+        if care_methods in entity_synonym:
+            entity_synonym[care_methods].extend(synonym)
+        else:
+            entity_synonym[care_methods] = synonym
+    for k, v in entity_synonym.items():
+        entity.append(
+            {
+                'name': k,
+                'type': '治疗方式',
+                'synonym': list(set(v)),
+                'children': [],
+            }
+        )
     return entity
 
 
