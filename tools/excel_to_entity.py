@@ -34,27 +34,31 @@ def extract_ill_label(df, entity):
 
 def extract_ill_name(df, entity):
     """抽取 `疾病名称` """
-    df_sub = df[['疾病名称', '同义词', '治疗方式']].dropna(how='all')
+    df_sub = df[['疾病名称', '同义词', '治疗方式', '相关词']].dropna(how='all')
     df_gb = df_sub.groupby(by='疾病名称').agg(list).reset_index()
     for idx, df_item in df_gb.iterrows():
+        # name
         ill_name = df_item['疾病名称']
-        care_method = df_item['治疗方式']
+        # synonym
         synonym = []
         for item in list(set(df_item['同义词'])):
             if not pd.isna(item):
                 data = item.split(',')
                 synonym += data
         synonym = list(set(synonym))
-        children = [item for item in care_method if not pd.isna(item)]
-        children_final = []
-        for child in children:
-            children_final += re.findall(r'[\u4e00-\u9fa5]+', child)
+        # children
+        care_methods = df_item['治疗方式'] + df_item['相关词']
+        children = []
+        for cm in care_methods:
+            if not pd.isna(cm):
+                children.extend(re.findall(r'[\u4e00-\u9fa5]+', cm))
+        # append
         entity.append(
             {
                 'name': ill_name,
                 'type': '疾病名称',
                 'synonym': synonym,
-                'children': children_final,
+                'children': children,
             }
         )
     return entity
@@ -139,7 +143,7 @@ def run(excel_file, json_file='entity.json', is_synonym_plus=False):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-e', '--excel_file', type=str, default='护理AI地图2.0.xlsx', help='读取的excel 文件')
+    parser.add_argument('-e', '--excel_file', type=str, default='护理AI地图 2.2.xlsx', help='读取的 excel 文件')
     parser.add_argument('-j', '--json_file', type=str, default='entity.json', help='保存的entity的json文件')
     parser.add_argument('-s', '--synonym_plus', default=False, action='store_true', help="同义词补充")
     args = parser.parse_args()

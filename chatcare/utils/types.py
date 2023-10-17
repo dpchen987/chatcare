@@ -58,10 +58,11 @@ class ChatCompletionResponse(BaseModel):
 
 
 class ChatKnowledgeBaseRequest(BaseModel):
+    chat_id: str
     messages: List[ChatMessage]
 
-
 class ChatKnowledgeBaseResponse(BaseModel):
+    chat_id: str
     error: int = 0
     summary: str = ''
     details: List[Union[Dict]] = []
