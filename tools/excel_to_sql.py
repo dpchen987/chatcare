@@ -55,6 +55,10 @@ if __name__ == '__main__':
     delete_db(engine, db1_name)
     delete_db(engine, db2_name)
     df1, df2 = excel_df(file_path)
+
+    df1 = df1.replace([',', '.', '?', '!', ' '], ['，', '。', '？', '！', ''])
+    df2 = df2.replace([',', '.', '?', '!', ' '], ['，', '。', '？', '！', ''])
+
     df1.to_sql(name=db1_name, con=engine, if_exists='append', index=False)
     df2.to_sql(name=db2_name, con=engine, if_exists='append', index=False)
 
