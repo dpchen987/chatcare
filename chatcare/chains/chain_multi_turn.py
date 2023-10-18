@@ -133,5 +133,6 @@ if __name__ == "__main__":
     query = '骨折如何照护'
     while 1:
         answer, chat_id = chain(query, chat_id='abc')
-        print(f'{chat_id = }, {answer = }')
+        print(f'{chat_id = }')
+        pprint(f'{answer = }')
         query = input('>')
