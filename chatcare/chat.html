@@ -398,24 +398,35 @@ video {
           content = response;
           var answer = content.summary;
           if (content.error == 0) {
-            var index = 0;
+            var hints = content.hints;
+            if (hints) {
+              var hints_str = "是以下哪一种：";
+              for ( const h in hints) {
+                hints_str += h + "，";
+              }
+              answer += hints_str;
+            }
             var details = content.details;
-            for (const v of details) {
-              index++;
-              var data = v.content;
-              if (v.images) {
-                for (var img of v.images) {
-                  if (path != '/') img = path + img;
-                  data += '<br>' + "<img src='" + img.replaceAll('.jpg', '.png') + "'>";
+            if (details) {
+              var index = 0;
+              for (const v of details) {
+                index++;
+                var category = v[0];
+                var data = v[1];
+                if (v.images) {
+                  for (var img of v.images) {
+                    if (path != '/') img = path + img;
+                    data += '<br>' + "<img src='" + img.replaceAll('.jpg', '.png') + "'>";
+                  }
                 }
-              }
-              if (v.videos) {
-                for (var vid of v.videos) {
-                  if (path != '/') vid = path + vid;
-                  data += '<br>' + "<video src='" + vid + "' controls>您的浏览器不支持视频标签</video>";
+                if (v.videos) {
+                  for (var vid of v.videos) {
+                    if (path != '/') vid = path + vid;
+                    data += '<br>' + "<video src='" + vid + "' controls>您的浏览器不支持视频标签</video>";
+                  }
                 }
+                answer += '<br><a href="#" class="check_details" data="' + data + '">' + index + ". " + v.title + '</a>';
               }
-              answer += '<br><a href="#" class="check_details" data="' + data + '">' + index + ". " + v.title + '</a>';
             }
           }
           message = new Message({
