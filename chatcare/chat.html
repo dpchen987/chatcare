@@ -388,7 +388,7 @@ video {
       var path = GetUrlRelativePath();
       console.log(JSON.stringify(data));
       $.ajax({
-        url: "./v1/chat/knowledge_base",
+        url: "./v1/chat/multi_turn",
         method: "POST",
         data: JSON.stringify(data),
         contentType: 'application/json; charset=utf-8',
@@ -396,26 +396,65 @@ video {
         success: function(response) {
           // todo
           content = response;
-          var answer = content.summary;
+          var answer = content.summary.replaceAll('\n', '<br><br>') + '<br>';
           if (content.error == 0) {
-            var index = 0;
+            var hints = content.hints;
+            if (hints) {
+              var hints_str = "";
+              for ( const h of hints) {
+                hints_str += h + "，";
+              }
+              answer += hints_str;
+            }
             var details = content.details;
-            for (const v of details) {
-              index++;
-              var data = v.content;
-              if (v.images) {
-                for (var img of v.images) {
+            if (details) {
+              if (content.intent_id == 1) {
+                var index_category = 0;
+                for (const v of details) {
+                  index_category++;
+                  var category = v[0];
+                  answer += '<br><div>' + index_category + '. ' + category + '</div>';
+                  var data = v[1];
+                  console.log(data);
+                  var index_z = 0;
+                  for (const d of data) {
+                    index_z++;
+                    var html = d.text.replaceAll('\n', '<br><br>');
+                    if (d.image_link) {
+                      for (var img of d.image_link) {
+                        img = '/static/' + img;
+                        if (path != '/') img = path + img;
+                        html += "<img src='" + img.replaceAll('.jpg', '.png') + "'>" + '<br>';
+                      }
+                    }
+                    if (d.video_link) {
+                      for (var vid of d.video_link) {
+                        vid = '/static/' + vid;
+                        if (path != '/') vid = path + vid;
+                        html += "<video src='" + vid + "' controls>您的浏览器不支持视频标签</video>" + '<br>';
+                      }
+                    }
+                    answer += '<a href="#" class="check_details" data="' + html + '">' + index_z + ". " + d.name + '</a><br>';
+                  }
+                }
+              } else {
+                // care_operation
+                var html = '';
+                var d = details[0][1][0];
+                for (var img of d.image_link) {
+                  img = '/static/' + img;
                   if (path != '/') img = path + img;
-                  data += '<br>' + "<img src='" + img.replaceAll('.jpg', '.png') + "'>";
+                  html += "<img src='" + img.replaceAll('.jpg', '.png') + "'>" + '<br>';
                 }
-              }
-              if (v.videos) {
-                for (var vid of v.videos) {
+                for (var vid of d.video_link) {
+                  vid = '/static/' + vid;
                   if (path != '/') vid = path + vid;
-                  data += '<br>' + "<video src='" + vid + "' controls>您的浏览器不支持视频标签</video>";
+                  html += "<video src='" + vid + "' controls>您的浏览器不支持视频标签</video>" + '<br>';
+                }
+                if (html) {
+                  answer += '<a href="#" class="check_details" data="' + html + '">' + "  查看图片视频>>" + '</a><br>';
                 }
               }
-              answer += '<br><a href="#" class="check_details" data="' + data + '">' + index + ". " + v.title + '</a>';
             }
           }
           message = new Message({

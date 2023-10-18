@@ -5,6 +5,7 @@
 # Visit http://localhost:8000/docs (default) for documents.
 
 import os
+import uuid
 import torch
 import uvicorn
 from fastapi import FastAPI, Cookie, Request, Response, Form
@@ -21,7 +22,7 @@ from chatcare.config import params
 from chatcare.api.chat_api import (
     list_models, chat_completions, chat_direct_with_llm,
     chat_direct_with_search_engine,
-    chat_with_knowledge_base
+    chat_with_knowledge_base, chat_multi_turn
 )
 from chatcare.api.knowledge_base_api import (
     list_kbs, create_kb, delete_kb
@@ -44,7 +45,7 @@ def create_app():
         root_path=params.root_path,
     )
     app.mount("/static", StaticFiles(directory="/workspace/knowledge_base/"), name="static")
-    # pkg_dir = os.path.dirname(os.path.abspath(__file__))
+    # pkg_dir = os.path.dirname(os.path.abspath(__file__)) /home/dapeng/chatcare-1/chatcare/login.html
     pkg_dir = '/workspace/knowledge_base/html/'
     html_path = os.path.join(pkg_dir, 'chat.html')
     login_path = os.path.join(pkg_dir, 'login.html')
@@ -78,6 +79,7 @@ def create_app():
             rd = '/' if not root_path else f'/{root_path}/'
             resp = RedirectResponse(rd, status_code=303)
             resp.set_cookie(key="user_id", value="whoami")
+            resp.set_cookie(key='chat_id', value=str(uuid.uuid4()))
             return resp
         rd = '/login' if not root_path else f'/{root_path}/login'
         return RedirectResponse(rd, status_code=303)
@@ -105,6 +107,13 @@ def create_app():
         summary="可用llm模型列表",
         response_model=ModelList
     )(list_models)
+
+    app.post(
+        "/v1/chat/multi_turn",
+        tags=["Chat"],
+        summary="ChatCare对话主接口",
+        response_model=ChatKnowledgeBaseResponse
+    )(chat_multi_turn)
 
     app.post(
         "/v1/chat/completions",

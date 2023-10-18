@@ -1,6 +1,6 @@
 # coding=utf-8
 import time
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Union, Tuple
 from pydantic import BaseModel, Field
 
 
@@ -60,11 +60,12 @@ class ChatCompletionResponse(BaseModel):
 class ChatKnowledgeBaseRequest(BaseModel):
     messages: List[ChatMessage]
 
-
 class ChatKnowledgeBaseResponse(BaseModel):
     error: int = 0
     summary: str = ''
-    details: List[Union[Dict]] = []
+    intent_id: int = 0
+    hints: List[str] = []
+    details: List[Tuple[str,List[Dict]]] = []
 
 
 class BaseResponse(BaseModel):

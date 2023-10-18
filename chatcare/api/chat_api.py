@@ -1,11 +1,11 @@
 # coding=utf-8
-from fastapi import HTTPException
+from fastapi import HTTPException, Request, Response, Cookie
 from fastapi.responses import StreamingResponse
-
+import uuid
 from chatcare.utils.types import *
 from chatcare.utils.logger import logger
 from chatcare.api.chat_llm import load_llm_model, chat_llm, chat_llm_stream
-from chatcare.api.chat_vector_search import chat_vector_search, chat_vector_search_stream
+from chatcare.api.chat_vector_search import chat_vector_search, chat_vector_search_stream, chat_match_search
 from chatcare.config import params
 
 
@@ -14,6 +14,32 @@ async def list_models():
     global model_args
     model_card = ModelCard(id=params.llm_model_name)
     return ModelList(data=[model_card])
+
+
+async def chat_multi_turn(request: ChatKnowledgeBaseRequest, response: Response, chat_id:str = Cookie(None)) -> ChatCompletionResponse:
+    """ChatCare对话接口"""
+    # chat id check
+    if not chat_id:
+        chat_id = uuid.uuid4()
+        logger.info("---create a new chatid ~---")
+    response.set_cookie(key='chat_id', value=chat_id)
+    print(chat_id)
+    if params.chat_mode == "vs":
+        chat_completions_api = chat_direct_with_search_engine
+    elif params.chat_mode == "llm":
+        chat_completions_api = chat_direct_with_llm
+    else:
+        chat_completions_api = chat_with_knowledge_base_mult
+    try:
+        return await chat_completions_api(request, chat_id)
+    except:
+        logger.exception('An error occurred in api: `/v1/chat/completions`!')
+        choice_data = ChatCompletionResponseChoice(
+            index=0,
+            message=ChatMessage(role="assistant", content="很抱歉，请重新问我一次！"),
+            finish_reason="stop"
+        )
+        return ChatCompletionResponse(model=request.model, choices=[choice_data], object="chat.completion")
 
 
 async def chat_completions(request: ChatCompletionRequest) -> ChatCompletionResponse:
@@ -111,16 +137,46 @@ async def chat_direct_with_llm(request: ChatCompletionRequest):
     return ChatCompletionResponse(model=request.model, choices=[choice_data], object="chat.completion")
 
 
-async def chat_with_knowledge_base(request: ChatKnowledgeBaseRequest):
+async def chat_with_knowledge_base(request: Request, chat_request: ChatKnowledgeBaseRequest):
     """
     chat_with_knowledge_base
     """
     response_chat_with_knowledge_base = ChatKnowledgeBaseResponse()
     try:
-        query = request.messages[-1].content
-        answer = await chat_vector_search(query, )
+        chat_id = request.cookies['chat_id']
+        chat_request.chat_id = chat_id
+        response_chat_with_knowledge_base.chat_id = chat_id
+        query = chat_request.messages[-1].content
+        # Todo 根据chat_id拉取history
+        history = None
+        answer = await chat_vector_search(query, history)
         if isinstance(answer, Dict):
             response_chat_with_knowledge_base.summary = answer['summary']
+            response_chat_with_knowledge_base.details = answer['details']
+
+        elif isinstance(answer, str):
+            response_chat_with_knowledge_base.error = 1
+            response_chat_with_knowledge_base.summary = f'您的提问<{query}>异常，请问我护理相关问题！'
+
+    except:
+        logger.exception('An error occurred in api: `chat_with_knowledge_base`!')
+        response_chat_with_knowledge_base.error = 2
+        response_chat_with_knowledge_base.summary = f'发生错误，请再问我一次！'
+
+    return response_chat_with_knowledge_base
+
+async def chat_with_knowledge_base_mult(chat_request: ChatKnowledgeBaseRequest, chat_id):
+    """
+    chat_with_knowledge_base request, chat_id
+    """
+    response_chat_with_knowledge_base = ChatKnowledgeBaseResponse()
+    try:
+        query = chat_request.messages[-1].content
+        answer = await chat_match_search(query, chat_id)
+        if isinstance(answer, Dict):
+            response_chat_with_knowledge_base.summary = answer['summary']
+            response_chat_with_knowledge_base.intent_id = answer['intent_id']
+            response_chat_with_knowledge_base.hints = answer['hints']
             response_chat_with_knowledge_base.details = answer['details']
 
         elif isinstance(answer, str):

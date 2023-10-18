@@ -7,14 +7,14 @@ class MemCache:
     '''
 
     def __init__(self, expire=180):
-        self.cache = {}  # {chat_id: {intent: xxx, entities: [], time: xxx}}
+        self.cache = {}  # {chat_id: {intent_id: xxx, entities: [], time: xxx}}
         self.expire = expire
         self.last_clean = 0
         self.inter_clean = 3600  # clean expired cache every 1 hour
 
-    def save(self, chat_id, intent, entities):
+    def save(self, chat_id, intent_id, entities):
         self.cache[chat_id] = {
-            'intent': intent,
+            'intent_id': intent_id,
             'entities': entities,
             'time': time.time()
         }
@@ -47,9 +47,9 @@ class RedisCache:
         self.r = self.redis.Redis(host=host, port=port, decode_responses=True)
         self.expire = expire
 
-    def save(self, chat_id, intent, entities):
+    def save(self, chat_id, intent_id, entities):
         oo = {
-            'intent': intent,
+            'intent_id': intent_id,
             'entities': entities
         }
         js = self.json.dumps(oo)
