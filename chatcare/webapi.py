@@ -46,8 +46,7 @@ def create_app():
     )
     app.mount("/static", StaticFiles(directory="/workspace/knowledge_base/"), name="static")
     # pkg_dir = os.path.dirname(os.path.abspath(__file__)) /home/dapeng/chatcare-1/chatcare/login.html
-    # pkg_dir = '/workspace/knowledge_base/html/'
-    pkg_dir = '/home/dapeng/chatcare-1/chatcare'
+    pkg_dir = '/workspace/knowledge_base/html/'
     html_path = os.path.join(pkg_dir, 'chat.html')
     login_path = os.path.join(pkg_dir, 'login.html')
     root_path = params.root_path
