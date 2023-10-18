@@ -388,7 +388,7 @@ video {
       var path = GetUrlRelativePath();
       console.log(JSON.stringify(data));
       $.ajax({
-        url: "./v1/chat/knowledge_base",
+        url: "./v1/chat/multi_turn",
         method: "POST",
         data: JSON.stringify(data),
         contentType: 'application/json; charset=utf-8',

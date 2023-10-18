@@ -8,9 +8,9 @@ from chatcare.chains.chain import chain
 from chatcare.chains import chain_multi_turn
 
 
-async def chat_multi_turn(query: str, history: List[List[str]] = None):
+async def chat_match_search(query: str, chat_id: str):
     time_start = time.time()
-    content = chain_multi_turn.chain(query)
+    content = chain_multi_turn.chain(query, chat_id)
     if isinstance(content, str):
         content = content.strip()
     if params.debug:
