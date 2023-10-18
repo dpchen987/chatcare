@@ -31,15 +31,21 @@ def process_entity(entities, context):
             logger.warn(f'invalid entity type: {et["type"]}')
             continue
         tmp.append(et)
-        if context and context['intent_id'] == intent_id:
-            for e in context['entities']:
-                if e['type'] == et['type']:
-                    continue
-                tmp.append(e)
         if intent_id in intent_entities:
             intent_entities[intent_id].extend(tmp)
         else:
             intent_entities[intent_id] = tmp
+    # context processing 
+    if context:
+        for iid, ee in intent_entities.items():
+            if iid != context['intent_id']:
+                continue
+            types = [e['type'] for e in ee]
+            for e in context['entities']:
+                if e['type'] in types:
+                    continue
+                ee.append(e)
+        
     # intents process 
     intent_id = 0
     got_entities = []
