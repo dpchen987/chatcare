@@ -37,7 +37,7 @@ def process_entity(entities, context):
                     continue
                 tmp.append(e)
         if intent_id in intent_entities:
-            intent_entities[intent_id].extend(et)
+            intent_entities[intent_id].extend(tmp)
         else:
             intent_entities[intent_id] = tmp
     # intents process 
@@ -94,6 +94,7 @@ def chain(query, chat_id):
         if msg != 'ok':
             return {
                 'summary': msg,
+                'intent_id': intent_id,
                 'hints': hints,
                 'details': []
             }
@@ -101,6 +102,7 @@ def chain(query, chat_id):
         msg, details = search_mysql(intent_id, intent_entities)
         result = {
             'summary': msg,
+            'intent_id': intent_id,
             'hints': [],
             'details': details,
         }
@@ -111,6 +113,7 @@ def chain(query, chat_id):
     if intent_id == 0:
         return {
             'summary': '超出我的知识范围，请询问护理相关的问题',
+            'intent_id': intent_id,
             'hints': [],
             'details': [],
         }
@@ -121,6 +124,7 @@ def chain(query, chat_id):
         msg = '请问您要查询的护理操作的名称是什么'
     return {
         'summary': msg,
+        'intent_id': intent_id,
         'hints': [],
         'details': []
     }
