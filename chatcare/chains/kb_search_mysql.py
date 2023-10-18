@@ -56,6 +56,14 @@ def search_disease(entities):
     data = db.query(sql)
     details = {}
     for d in data:
+        if d['image_link'] != 'None':
+            d['image_link'] = d['image_link'].split(',')
+        else:
+            d['image_link'] = []
+        if d['video_link'] != 'None':
+            d['video_link'] = d['video_link'].split(',')
+        else:
+            d['video_link'] = []
         category = d.pop('category')
         if category in details:
             details[category].append(d)
@@ -67,9 +75,17 @@ def search_disease(entities):
 
 def search_operation(entities):
     sql = f'select name, text, image_link, video_link from care_operation where name="{entities[0]["name"]}"'
-    op = db.get(sql)
-    data = [(op['name'], [op])]
-    msg = f"{entities[0]['name']} 的操作方法：{op['text']}"
+    d = db.get(sql)
+    if d['image_link'] != 'None':
+        d['image_link'] = d['image_link'].split(',')
+    else:
+        d['image_link'] = []
+    if d['video_link'] != 'None':
+        d['video_link'] = d['video_link'].split(',')
+    else:
+        d['video_link'] = []
+    data = [(d['name'], [d])]
+    msg = f"{entities[0]['name']} 的操作方法：\n{d['text']}"
     return msg, data 
 
 
