@@ -68,8 +68,9 @@ def search_disease(entities):
 def search_operation(entities):
     sql = f'select name, text, image_link, video_link from care_operation where name="{entities[0]["name"]}"'
     op = db.get(sql)
+    data = [(op['name'], [op])]
     msg = f"{entities[0]['name']} 的操作方法：{op['text']}"
-    return msg, op
+    return msg, data 
 
 
 def search_mysql(intent_id, entities):
