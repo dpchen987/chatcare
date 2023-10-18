@@ -22,7 +22,7 @@ from chatcare.config import params
 from chatcare.api.chat_api import (
     list_models, chat_completions, chat_direct_with_llm,
     chat_direct_with_search_engine,
-    chat_with_knowledge_base
+    chat_with_knowledge_base, chat_multi_turn
 )
 from chatcare.api.knowledge_base_api import (
     list_kbs, create_kb, delete_kb
@@ -45,8 +45,9 @@ def create_app():
         root_path=params.root_path,
     )
     app.mount("/static", StaticFiles(directory="/workspace/knowledge_base/"), name="static")
-    # pkg_dir = os.path.dirname(os.path.abspath(__file__))
-    pkg_dir = '/workspace/knowledge_base/html/'
+    # pkg_dir = os.path.dirname(os.path.abspath(__file__)) /home/dapeng/chatcare-1/chatcare/login.html
+    # pkg_dir = '/workspace/knowledge_base/html/'
+    pkg_dir = '/home/dapeng/chatcare-1/chatcare'
     html_path = os.path.join(pkg_dir, 'chat.html')
     login_path = os.path.join(pkg_dir, 'login.html')
     root_path = params.root_path
@@ -107,6 +108,13 @@ def create_app():
         summary="可用llm模型列表",
         response_model=ModelList
     )(list_models)
+
+    app.post(
+        "/v1/chat/multi_turn",
+        tags=["Chat"],
+        summary="ChatCare对话主接口",
+        response_model=ChatKnowledgeBaseResponse
+    )(chat_multi_turn)
 
     app.post(
         "/v1/chat/completions",
