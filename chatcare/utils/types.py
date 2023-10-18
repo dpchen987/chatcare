@@ -63,6 +63,7 @@ class ChatKnowledgeBaseRequest(BaseModel):
 class ChatKnowledgeBaseResponse(BaseModel):
     error: int = 0
     summary: str = ''
+    intent_id: int = 0
     hints: List[str] = []
     details: List[Tuple[str,List[Dict]]] = []
 
