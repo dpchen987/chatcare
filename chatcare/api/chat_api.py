@@ -16,7 +16,7 @@ async def list_models():
     return ModelList(data=[model_card])
 
 
-async def chat_multi_turn(request: ChatCompletionRequest, response: Response, chat_id:str = Cookie(None)) -> ChatCompletionResponse:
+async def chat_multi_turn(request: ChatKnowledgeBaseRequest, response: Response, chat_id:str = Cookie(None)) -> ChatCompletionResponse:
     """ChatCare对话接口"""
     # chat id check
     if not chat_id:
@@ -173,9 +173,9 @@ async def chat_with_knowledge_base_mult(chat_request: ChatKnowledgeBaseRequest, 
     try:
         query = chat_request.messages[-1].content
         answer = await chat_match_search(query, chat_id)
-        logger.info(f"{answer=}")
         if isinstance(answer, Dict):
             response_chat_with_knowledge_base.summary = answer['summary']
+            response_chat_with_knowledge_base.intent_id = answer['intent_id']
             response_chat_with_knowledge_base.hints = answer['hints']
             response_chat_with_knowledge_base.details = answer['details']
 
