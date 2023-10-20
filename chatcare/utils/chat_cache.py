@@ -24,9 +24,9 @@ class MemCache:
             self.last_clean = time.time()
             self.clean()
         cache = self.cache.get(chat_id)
-        if time.time() - cache['time'] > self.expire:
+        if cache and time.time() - cache['time'] > self.expire:
             self.cache.pop(chat_id)
-            return None
+            cache = None
         return cache
 
     def clean(self,):
