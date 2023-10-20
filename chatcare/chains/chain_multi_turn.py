@@ -30,6 +30,8 @@ def process_entity(entities, context):
         else:
             logger.warn(f'invalid entity type: {et["type"]}')
             continue
+        if et['type'] == '疾病名称':
+            hints = et['children']
         tmp.append(et)
         if intent_id in intent_entities:
             intent_entities[intent_id].extend(tmp)
