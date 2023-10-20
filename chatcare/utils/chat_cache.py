@@ -23,7 +23,11 @@ class MemCache:
         if time.time() - self.last_clean > self.inter_clean:
             self.last_clean = time.time()
             self.clean()
-        return self.cache.get(chat_id)
+        cache = self.cache.get(chat_id)
+        if time.time() - cache['time'] > self.expire:
+            self.cache.pop(chat_id)
+            return None
+        return cache
 
     def clean(self,):
         now = time.time()
