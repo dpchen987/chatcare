@@ -407,7 +407,7 @@ video {
               answer += hints_str;
             }
             var details = content.details;
-            if (details) {
+            if (details.length > 0) {
               if (content.intent_id == 1) {
                 var index_category = 0;
                 for (const v of details) {
@@ -437,7 +437,7 @@ video {
                     answer += '<a href="#" class="check_details" data="' + html + '">' + index_z + ". " + d.name + '</a><br>';
                   }
                 }
-              } else {
+              } else if (content.intent_id == 2){
                 // care_operation
                 var html = '';
                 var d = details[0][1][0];
