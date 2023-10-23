@@ -5,6 +5,7 @@ from chatcare.utils.chat_cache import MemCache
 from chatcare.utils.logger import logger
 
 from chatcare.chains.entity import query_entity
+from chatcare.chains.entity import entity as all_entities
 from chatcare.chains.intention import intentions
 from chatcare.chains.kb_search_mysql import search_mysql
 
@@ -18,8 +19,16 @@ def process_entity(entities, context):
     for et in entities:
         tmp = []
         if et['type'] == '疾病类别':
-            msg = f'请问老人的{et["name"]}，具体是以下哪种？'
-            hints = et['children']
+            context = None
+            children = '，'.join(et['children'])
+            msg = f"老年人的常见的{et['name']}有{children}等，颐小爱目前可以为您提供以上病种的护理信息支持，请问老人是哪种{et['name']}？"
+            hints = []
+            for c in et['children']:
+                for z in all_entities:
+                    if z['name'] == c:
+                        synonym = ','.join(z['synonym'][:1])
+                        x = f'{c}（{synonym}）'
+                        hints.append(x)
             intent_entities[1] = []
             has_disease_type = True
             continue
@@ -43,8 +52,14 @@ def process_entity(entities, context):
             if iid != context['intent_id']:
                 continue
             types = [e['type'] for e in ee]
+            no_treatment = False
+            for e in ee:
+                if not e['children'] and e['type'] == '疾病名称':
+                    no_treatment = True
             for e in context['entities']:
                 if e['type'] in types:
+                    continue
+                if no_treatment and e['type'] == '治疗方式':
                     continue
                 ee.append(e)
         
@@ -59,12 +74,21 @@ def process_entity(entities, context):
         intents.sort()
         intent_id = intents[0]
         got_entities = intent_entities[intent_id]
-        print(f'{got_entities = }')
-        got_slots = [g['type'] for g in got_entities]
+        logger.info(f'{got_entities = }')
+        got_slots = {g['type']: g for g in got_entities}
         slots = intentions[intent_id]['slots']
         logger.info(f'got entities: {got_entities}, slots: {slots}')
-        lack = [e for e in slots if e not in got_slots]
-        print(f'{lack = }')
+        lack = []
+        no_treatment = False
+        for e in slots:
+            if e in got_slots:
+                if e == '疾病名称' and not got_slots[e]['children']:
+                    no_treatment = True
+                continue
+            if e == '治疗方式' and no_treatment:
+                continue
+            lack.append(e)
+        logger.info(f'{lack = }')
         if not lack:
             msg = 'ok'
         else:
@@ -72,7 +96,7 @@ def process_entity(entities, context):
                 if lack[0] == '疾病名称':
                     msg = '请问老人患有哪种疾病？'
                 else:
-                    msg = f'请问老人的{lack[0]} 是怎样的？'
+                    msg = '请问老人采用哪种形式的治疗？'
     return msg, hints, intent_id, got_entities 
 
 
@@ -92,9 +116,9 @@ def chain(query, chat_id):
 
     '''
     context = CHAT_CACHE.get(chat_id)
-    print(f'{context = }')
+    logger.info(f'{context = }')
     entities = query_entity(query)
-    print(f'{entities = }')
+    logger.info(f'recgonition: {entities = }')
     if entities:
         msg, hints, intent_id, intent_entities = process_entity(entities, context)
         if intent_entities:
@@ -120,7 +144,7 @@ def chain(query, chat_id):
     intent_id = classify(embedding)
     if intent_id == 0:
         return {
-            'summary': '超出我的知识范围，请询问居家护理相关的问题',
+            'summary': '对不起你的问题超出颐小爱的知识范围了，我可以回答关于护理、健康、康复等相关问题。有什么关于家庭护理方面的问题我可以帮助您解答吗？',
             'intent_id': intent_id,
             'hints': [],
             'details': [],
