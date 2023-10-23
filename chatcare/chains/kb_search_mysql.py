@@ -34,7 +34,6 @@ def sort_category(c):
 def search_disease(entities):
     where = [f'{entity2field[1][e["type"]]} = "{e["name"]}"' for e in entities]
     where = ' AND '.join(where)
-    where = where.replace('保守治疗', '保守治疗（没有做过手术）')
     sql = f'select preface, solutions from care_disease where {where}'
     print(f'{sql = }')
     data = db.get(sql)
