@@ -20,7 +20,7 @@ zzz = {
     'large': 1024
 }
 embed_dim = zzz[msize]
-num_class = 3
+num_class = 4
 
 
 class EmbeddingDataset(Dataset):
@@ -76,9 +76,10 @@ def train(train_data_path, test_data_path):
     validationloader = DataLoader(val_data, batch_size=2, shuffle=False)
 
     assert embed_dim == embeds.shape[-1]
+    print("len(set(labels)", len(set(labels)))
     assert num_class == len(set(labels))
     print(f'-- {embed_dim = }, {num_class = } ===================')
-    assert num_class == 3
+    assert num_class == 4
     lr = 0.0001
     momentum = 0.9
     model = EmbeddingClassification(embed_dim, num_class)

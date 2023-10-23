@@ -27,7 +27,7 @@ params = Params(
     num_class=26,
     classify_model_path='/workspace/models/embedding_classify.pt',
     # cf2
-    num_class_intention=3,
+    num_class_intention=4,
     classify_intention_path='/workspace/models/intention_classify.pt',
 
     # vector store: hnsw
