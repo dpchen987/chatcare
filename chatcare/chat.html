@@ -424,7 +424,7 @@ video {
                       for (var img of d.image_link) {
                         img = '/static/' + img;
                         if (path != '/') img = path + img;
-                        html += "<img src='" + img.replaceAll('.jpg', '.png') + "'>" + '<br>';
+                        html += "<img src='" + img + "'>" + '<br>';
                       }
                     }
                     if (d.video_link) {
@@ -444,7 +444,7 @@ video {
                 for (var img of d.image_link) {
                   img = '/static/' + img;
                   if (path != '/') img = path + img;
-                  html += "<img src='" + img.replaceAll('.jpg', '.png') + "'>" + '<br>';
+                  html += "<img src='" + img + "'>" + '<br>';
                 }
                 for (var vid of d.video_link) {
                   vid = '/static/' + vid;
