@@ -73,7 +73,7 @@ def extract_treat_method(df, entity):
     for idx, df_item in df_sub.iterrows():
         care_methods = df_item['治疗方式']
         related = df_item['相关词']
-        synonym = re.findall(r'[\u4e00-\u9fa5]+', related)
+        synonym = re.findall(r'[\u4e00-\u9fa5]+', related) + re.findall(r'[\u4e00-\u9fa5]+', care_methods)
         if care_methods in entity_synonym:
             entity_synonym[care_methods].extend(synonym)
         else:
