@@ -47,11 +47,11 @@ def extract_ill_name(df, entity):
                 synonym += data
         synonym = list(set(synonym))
         # children
-        care_methods = df_item['治疗方式'] + df_item['相关词']
+        care_methods = df_item['治疗方式']
         children = []
         for cm in care_methods:
             if not pd.isna(cm):
-                children.extend(re.findall(r'[\u4e00-\u9fa5]+', cm))
+                children.append(cm)
         # append
         entity.append(
             {
