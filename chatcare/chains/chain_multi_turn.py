@@ -144,7 +144,7 @@ def chain(query, chat_id):
     intent_id = classify(embedding)
     if intent_id == 0:
         return {
-            'summary': '对不起你的问题超出颐小爱的知识范围了，我可以回答关于护理、健康、康复等相关问题。有什么关于家庭护理方面的问题我可以帮助您解答吗？',
+            'summary': '对不起，你的问题超出我的知识范围了，我可以回答关于专病种护理、健康、康复等相关问题。如果您有与专科疾病护理相关的问题或需要特定建议，随时向我提问。'
             'intent_id': intent_id,
             'hints': [],
             'details': [],
@@ -152,7 +152,7 @@ def chain(query, chat_id):
     # ask for identity
     if intent_id == 3:
         return {
-            'summary': '我是颐小爱护理AI，专注于提供专科疾病领域的家庭护理信息和支持。我可以回答关于护理、健康、康复等相关问题。有什么关于家庭护理方面的问题我可以帮助您解答吗？',
+            'summary': '我是颐家的护理AI助手，专注于提供专科疾病领域的家庭护理信息和支持。我可以回答关于专病种护理、健康、康复等相关问题。如果您有与专科疾病护理相关的问题或需要特定建议，随时向我提问。'
             'intent_id': intent_id,
             'hints': [],
             'details': [],
