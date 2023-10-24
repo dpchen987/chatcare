@@ -43,7 +43,7 @@ def extract_ill_name(df, entity):
         synonym = []
         for item in list(set(df_item['同义词'])):
             if not pd.isna(item):
-                data = item.split(',')
+                data = re.findall(r'[\u4e00-\u9fa5]+', item)
                 synonym += data
         synonym = list(set(synonym))
         # children
@@ -71,9 +71,9 @@ def extract_treat_method(df, entity):
     df_sub.drop_duplicates(inplace=True)
     entity_synonym = {}
     for idx, df_item in df_sub.iterrows():
-        care_methods = df_item['治疗方式']
+        care_methods = df_item['治疗方式'].split('（')[0]
         related = df_item['相关词']
-        synonym = re.findall(r'[\u4e00-\u9fa5]+', related) + re.findall(r'[\u4e00-\u9fa5]+', care_methods)
+        synonym = re.findall(r'[\u4e00-\u9fa5]+', related) + re.findall(r'[\u4e00-\u9fa5]+', df_item['治疗方式'])
         if care_methods in entity_synonym:
             entity_synonym[care_methods].extend(synonym)
         else:
