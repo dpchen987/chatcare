@@ -157,6 +157,14 @@ def chain(query, chat_id):
             'hints': [],
             'details': [],
         }
+    # ask for basecare
+    if intent_id == 4:
+        return {
+            'summary': '我目前专注于提供专科疾病领域的家庭护理知识，你可以尝试问我疾病护理相关的问题，如，老人骨折了如何照护？',
+            'intent_id': intent_id,
+            'hints': [],
+            'details': [],
+        }
     # right intent but no entities
     if intent_id == 1:
         msg = '请问老人患的是哪种病？'
