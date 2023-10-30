@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import torch
-
+from chatcare.utils.logger import logger
 from chatcare.utils.classification_model import EmbeddingClassification
 from chatcare.config import params
 
@@ -20,6 +20,7 @@ def classify(embed):
     with torch.no_grad():
         ilabel = model(embed)
     ilabel = int(ilabel.argmax(dim=1)[0])
-    return ilabel
+    logger.info(f"attention id : {ilabel}")
+    return str(ilabel)
 
 

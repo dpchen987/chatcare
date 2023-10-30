@@ -90,7 +90,7 @@ def search_operation(entities):
 
 
 def search_mysql(intent_id, entities):
-    if intent_id == 1:
+    if intent_id == '1':
         return search_disease(entities)
-    if intent_id == 2:
+    if intent_id == '2':
         return search_operation(entities)

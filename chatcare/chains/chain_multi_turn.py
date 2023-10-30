@@ -8,6 +8,7 @@ from chatcare.chains.entity import query_entity
 from chatcare.chains.entity import entity as all_entities
 from chatcare.chains.intention import intentions
 from chatcare.chains.kb_search_mysql import search_mysql
+from chatcare.config import params
 
 CHAT_CACHE = MemCache()
 
@@ -29,13 +30,13 @@ def process_entity(entities, context):
                         synonym = ','.join(z['synonym'][:1])
                         x = f'{c}（{synonym}）'
                         hints.append(x)
-            intent_entities[1] = []
+            intent_entities['1'] = []
             has_disease_type = True
             continue
         if et['type'] in ['疾病名称', '治疗方式']:
-            intent_id = 1  # 查询疾病护理方案
+            intent_id = '1'  # 查询疾病护理方案
         elif et['type'] == '操作名称':
-            intent_id = 2
+            intent_id = '2'
         else:
             logger.warn(f'invalid entity type: {et["type"]}')
             continue
@@ -64,7 +65,7 @@ def process_entity(entities, context):
                 ee.append(e)
         
     # intents process 
-    intent_id = 0
+    intent_id = '0'
     got_entities = []
     if not intent_entities:
         logger.warn(f'no invalid entity from {entities}')
@@ -142,40 +143,15 @@ def chain(query, chat_id):
     # no entities
     embedding = bge.encode_queries([query])
     intent_id = classify(embedding)
-    if intent_id == 0:
+
+    # return intent id & script
+    if intent_id in intentions:
         return {
-            'summary': '对不起，你的问题超出我的知识范围了，我可以回答关于专病种护理、健康、康复等相关问题。如果您有与专科疾病护理相关的问题或需要特定建议，随时向我提问。',
+            'summary': intentions[intent_id]["intent_script"],
             'intent_id': intent_id,
             'hints': [],
             'details': [],
         }
-    # ask for identity
-    if intent_id == 3:
-        return {
-            'summary': '我是颐家的护理AI助手，专注于提供专科疾病领域的家庭护理信息和支持。我可以回答关于专病种护理、健康、康复等相关问题。如果您有与专科疾病护理相关的问题或需要特定建议，随时向我提问。',
-            'intent_id': intent_id,
-            'hints': [],
-            'details': [],
-        }
-    # ask for basecare
-    if intent_id == 4:
-        return {
-            'summary': '我目前专注于提供专科疾病领域的家庭护理知识，你可以尝试问我疾病护理相关的问题，如，老人骨折了如何照护？',
-            'intent_id': intent_id,
-            'hints': [],
-            'details': [],
-        }
-    # right intent but no entities
-    if intent_id == 1:
-        msg = '请问老人患的是哪种病？'
-    elif intent_id == 2:
-        msg = '请问您要查询的护理操作的名称是什么'
-    return {
-        'summary': msg,
-        'intent_id': intent_id,
-        'hints': [],
-        'details': []
-    }
 
 
 if __name__ == "__main__":

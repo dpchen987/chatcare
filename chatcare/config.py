@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-
 from chatcare.utils.params import Params
 from chatcare.utils.logger import logger
 
@@ -29,6 +28,7 @@ params = Params(
     # cf2
     num_class_intention=5,
     classify_intention_path='/workspace/models/intention_classify.pt',
+    intention_inf_json = '/workspace/knowledge_base/qa/intention.json',
 
     # vector store: hnsw
     hnsw_kb_init_jsonl="/workspace/knowledge_base/qa/example_v1.2.2.jsonl",  # 初始化db的问答对
@@ -74,7 +74,6 @@ def update_params_from_env():
     params.db_name = os.getenv('DB_NAME', params.db_name)
     params.db_user = os.getenv('DB_USER', params.db_user)
     params.db_pass= os.getenv('DB_PASS', params.db_pass)
-
 
 update_params_from_env()
 
