@@ -64,6 +64,14 @@ def search_disease(entities):
             d['video_link'] = d['video_link'].split(',')
         else:
             d['video_link'] = []
+        # fix link
+        for i, lk in enumerate(d['image_link']):
+            if not lk.startswith('http'):
+                d['image_link'][i] = '/static/' + lk
+        for i, lk in enumerate(d['video_link']):
+            if not lk.startswith('http'):
+                d['video_link'][i] = '/static/' + lk
+        print(d)
         category = d.pop('category')
         if category in details:
             details[category].append(d)
