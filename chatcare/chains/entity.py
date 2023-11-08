@@ -18,30 +18,13 @@ def _init_entity():
         jieba_dict_list.append(item['name'])
         jieba_dict_list.extend(item['synonym'])
     jieba_dict_list = sorted(list(set(jieba_dict_list)))
-    with open('entity_dict.txt', 'w', encoding='utf-8') as f:
-        jieba_dict_list = [word + '\n' for word in jieba_dict_list]
-        f.writelines(jieba_dict_list)
-    jieba.load_userdict('entity_dict.txt')
-
+    freq = 1000
+    for word in jieba_dict_list:
+        jieba.add_word(word, freq)
     return entity, entity_searcher
 
 
 entity, entity_searcher = _init_entity()
-
-
-def search_entity(word: str, entity_searcher: dict) -> dict:
-    """
-    查寻
-
-    Args:
-        word:
-        entity_searcher:
-    Return:
-        entity (dict): entity or None
-    """
-    for search_word in entity_searcher:
-        if word == search_word:
-            return entity_searcher[search_word]
 
 
 def query_entity(query: str) -> list:
@@ -56,8 +39,10 @@ def query_entity(query: str) -> list:
     seg_list = jieba.cut(query, cut_all=False)
     entities = []
     for seg in seg_list:
-        entity = search_entity(seg, entity_searcher)
-        entities.append(entity) if entity else None
+        entity = entity_searcher.get(seg)
+        if entity is None:
+            continue
+        entities.append(entity)
     entities = [eval(entity) for entity in set([str(entity) for entity in entities])]
     return entities
 
