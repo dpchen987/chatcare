@@ -422,14 +422,14 @@ video {
                     var html = d.text.replaceAll('\n', '<br><br>');
                     if (d.image_link) {
                       for (var img of d.image_link) {
-                        img = '/static/' + img;
+                        // img = '/static/' + img;
                         if (path != '/') img = path + img;
                         html += "<img src='" + img + "'>" + '<br>';
                       }
                     }
                     if (d.video_link) {
                       for (var vid of d.video_link) {
-                        vid = '/static/' + vid;
+                        // vid = '/static/' + vid;
                         if (path != '/') vid = path + vid;
                         html += "<video src='" + vid + "' controls>您的浏览器不支持视频标签</video>" + '<br>';
                       }
@@ -442,12 +442,12 @@ video {
                 var html = '';
                 var d = details[0][1][0];
                 for (var img of d.image_link) {
-                  img = '/static/' + img;
+                  // img = '/static/' + img;
                   if (path != '/') img = path + img;
                   html += "<img src='" + img + "'>" + '<br>';
                 }
                 for (var vid of d.video_link) {
-                  vid = '/static/' + vid;
+                  // vid = '/static/' + vid;
                   if (path != '/') vid = path + vid;
                   html += "<video src='" + vid + "' controls>您的浏览器不支持视频标签</video>" + '<br>';
                 }
