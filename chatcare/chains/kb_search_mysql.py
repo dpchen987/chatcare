@@ -102,3 +102,25 @@ def search_mysql(intent_id, entities):
         return search_disease(entities)
     if intent_id == '2':
         return search_operation(entities)
+
+
+def update_link():
+    sql = 'select id, image_link, video_link from care_operation'
+    data = db.query(sql)
+    for d in data:
+        if d['image_link'] != 'None':
+            url = 'https://chatcare.oss-cn-shanghai.aliyuncs.com/img/' + d['image_link'].split('/')[-1]
+            sql = f'update care_operation set image_link="{url}" where id={d["id"]}'
+            print(sql)
+            db.execute(sql)
+        if d['video_link'] != 'None':
+            url = 'https://chatcare.oss-cn-shanghai.aliyuncs.com/video/' + d['video_link'].split('/')[-1]
+            sql = f'update care_operation set video_link="{url}" where id={d["id"]}'
+            print(sql)
+            db.execute(sql)
+    print('done')
+
+
+if __name__ == '__main__':
+    update_link()
+
