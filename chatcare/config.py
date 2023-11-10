@@ -50,6 +50,7 @@ params = Params(
 
     # mysql
     db_host='127.0.0.1',
+    db_port='3306',
     db_name='chatcare',
     db_user='ailab',
     db_pass='TheAIdb0',
@@ -71,6 +72,7 @@ def update_params_from_env():
     params.debug = os.getenv("DEBUG", params.debug)
     params.root_path = os.getenv("ROOT_PATH", params.root_path)
     params.db_host = os.getenv('DB_HOST', params.db_host)
+    params.db_port = int(os.getenv('DB_PORT', params.db_port))
     params.db_name = os.getenv('DB_NAME', params.db_name)
     params.db_user = os.getenv('DB_USER', params.db_user)
     params.db_pass= os.getenv('DB_PASS', params.db_pass)
