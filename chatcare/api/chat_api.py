@@ -20,7 +20,7 @@ async def chat_multi_turn(request: ChatKnowledgeBaseRequest, response: Response,
     """ChatCare对话接口"""
     # chat id check
     if not chat_id:
-        chat_id = uuid.uuid4()
+        chat_id = str(uuid.uuid4())
         logger.info("---create a new chatid ~---")
     response.set_cookie(key='chat_id', value=chat_id)
     print(chat_id)
