@@ -17,19 +17,32 @@ fi
 # generate local workspace
 cp ../requirements.txt .
 # mkdir -p ./workspace/models/
-# cp -rL /workspace/knowledge_base ./workspace/
-# cp -rL /workspace/models/bge-base-zh ./workspace/models/
-# cp -r /workspace/models/embedding_classify.pt ./workspace/models
-
+cp -rLp /workspace/knowledge_base ./workspace/
+cp -rLp /workspace/models/bge-base-zh ./workspace/models/
+cp -rp /workspace/models/embedding_classify.pt ./workspace/models
+cp -rp /workspace/models/intention_classify.pt ./workspace/models
+chmod -R 777 workspace
 # generate Docerfile
+# cat << EOF > Dockerfile
+# FROM python:3.8-slim
+# WORKDIR /app
+# ENV TZ="Asia/Shanghai"
+# COPY requirements.txt $hnswlib_whl chatcare-$version-cp38-cp38-linux_x86_64.whl /app/
+# RUN pip install -i https://mirrors.aliyun.com/pypi/simple/ --no-cache-dir -r requirements.txt \
+#     && pip install --no-cache-dir $hnswlib_whl chatcare-$version-cp38-cp38-linux_x86_64.whl \
+#     && rm $hnswlib_whl chatcare-$version-cp38-cp38-linux_x86_64.whl
+
+# CMD [ "chatcare"]
+# EOF
 cat << EOF > Dockerfile
 FROM python:3.8-slim
 WORKDIR /app
 ENV TZ="Asia/Shanghai"
-COPY requirements.txt $hnswlib_whl chatcare-$version-cp38-cp38-linux_x86_64.whl /app/
-RUN pip install -i https://mirrors.aliyun.com/pypi/simple/ --no-cache-dir -r requirements.txt \
-    && pip install --no-cache-dir $hnswlib_whl chatcare-$version-cp38-cp38-linux_x86_64.whl \
-    && rm $hnswlib_whl chatcare-$version-cp38-cp38-linux_x86_64.whl
+COPY requirements.txt /app/
+RUN pip install -i https://mirrors.aliyun.com/pypi/simple/ --no-cache-dir -r requirements.txt
+COPY $hnswlib_whl chatcare-$version-cp38-cp38-linux_x86_64.whl /app/
+RUN pip install --no-cache-dir $hnswlib_whl chatcare-$version-cp38-cp38-linux_x86_64.whl \
+ && rm $hnswlib_whl chatcare-$version-cp38-cp38-linux_x86_64.whl
 
 CMD [ "chatcare"]
 EOF

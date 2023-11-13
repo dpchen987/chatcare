@@ -7,7 +7,7 @@ from chatcare.utils.logger import logger
 from chatcare.api.chat_llm import load_llm_model, chat_llm, chat_llm_stream
 from chatcare.api.chat_vector_search import chat_vector_search, chat_vector_search_stream, chat_match_search
 from chatcare.config import params
-
+from typing_extensions import Annotated
 
 async def list_models():
     """获取所有llm列表"""
@@ -16,7 +16,7 @@ async def list_models():
     return ModelList(data=[model_card])
 
 
-async def chat_multi_turn(request: ChatKnowledgeBaseRequest, response: Response, chat_id:str = Cookie(None)) -> ChatCompletionResponse:
+async def chat_multi_turn(request: ChatKnowledgeBaseRequest, response: Response, chat_id: Annotated[Union[str, None], Cookie()] = None) -> ChatCompletionResponse:
     """ChatCare对话接口"""
     # chat id check
     if not chat_id:

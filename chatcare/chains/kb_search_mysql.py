@@ -7,6 +7,7 @@ db = ConnectionSync(
     params.db_name,
     params.db_user,
     params.db_pass,
+    params.db_port,
 )
 
 entity2field = {
