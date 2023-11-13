@@ -79,7 +79,7 @@ def create_app():
             rd = '/' if not root_path else f'/{root_path}/'
             resp = RedirectResponse(rd, status_code=303)
             resp.set_cookie(key="user_id", value="whoami")
-            resp.set_cookie(key='chat_id', value=str(uuid.uuid4()))
+            # resp.set_cookie(key='chat_id', value=str(uuid.uuid4()))
             return resp
         rd = '/login' if not root_path else f'/{root_path}/login'
         return RedirectResponse(rd, status_code=303)
