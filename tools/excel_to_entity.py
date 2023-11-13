@@ -44,8 +44,9 @@ def extract_ill_name(df, entity):
         for item in list(set(df_item['同义词'])):
             if not pd.isna(item):
                 data = re.findall(r'[\u4e00-\u9fa5]+', item)
-                synonym += data
-        synonym = list(set(synonym))
+                for d in data:
+                    if d not in synonym:
+                        synonym.append(d)
         # children
         care_methods = df_item['治疗方式']
         children = []
@@ -133,7 +134,7 @@ def run(excel_file, json_file='entity.json', is_synonym_plus=False):
     extract_ill_name(df_ill_kind, entity)
     extract_ill_label(df_ill_kind, entity)
     extract_treat_method(df_ill_kind, entity)
-    extract_care_method(df_care_method, entity)
+    # extract_care_method(df_care_method, entity)  # 不需要支持单独问”操作”
     if is_synonym_plus:
         synonym_plus(entity)
     json.dump(entity, open(json_file, 'w', encoding='utf-8'), ensure_ascii=False, indent=4)
