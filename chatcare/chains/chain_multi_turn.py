@@ -116,6 +116,14 @@ def chain(query, chat_id):
             2. 针对该意图，让用户补充实体
 
     '''
+    if query == '新话题':
+        CHAT_CACHE.save(chat_id, 0, [])
+        return {
+            'summary': '好的，我们开始新话题吧',
+            'intent_id': 0,
+            'hints': [],
+            'details': []
+        }
     context = CHAT_CACHE.get(chat_id)
     logger.info(f'{context = }')
     entities = query_entity(query)
