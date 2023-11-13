@@ -95,7 +95,7 @@ def search_operation(entities):
         d['video_link'] = []
     data = [(d['name'], [d])]
     msg = f"{entities[0]['name']} 的操作方法：\n{d['text']}"
-    return msg, data 
+    return msg, data
 
 
 def search_mysql(intent_id, entities):
@@ -109,12 +109,12 @@ def update_link():
     sql = 'select id, image_link, video_link from care_operation'
     data = db.query(sql)
     for d in data:
-        if d['image_link'] != 'None':
+        if d['image_link'].strip() != 'None':
             url = 'https://chatcare.oss-cn-shanghai.aliyuncs.com/img/' + d['image_link'].split('/')[-1]
             sql = f'update care_operation set image_link="{url}" where id={d["id"]}'
             print(sql)
             db.execute(sql)
-        if d['video_link'] != 'None':
+        if d['video_link'].strip() != 'None':
             url = 'https://chatcare.oss-cn-shanghai.aliyuncs.com/video/' + d['video_link'].split('/')[-1]
             sql = f'update care_operation set video_link="{url}" where id={d["id"]}'
             print(sql)
