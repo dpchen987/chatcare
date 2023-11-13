@@ -14,7 +14,8 @@ def connect_db():
 
 def delete_db(engine, db_name):
     with engine.connect() as connection:
-        connection.execute(f"DELETE FROM {db_name}")
+        # connection.execute(f"DELETE FROM {db_name}")
+        connection.execute(f"truncate table {db_name}")
 
 def excel_df(file_path):
     sheet1_df = pd.read_excel(file_path, sheet_name='病种')
@@ -44,6 +45,7 @@ def excel_df(file_path):
     zz = [z[0] for z in zz]
     df1['treatment'] = zz
     df2.loc[df2['category']=='None', 'category'] = -1
+    df2 = df2.drop(df2[df2['category'] == -1].index)
 
     return df1, df2
 
