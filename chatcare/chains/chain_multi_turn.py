@@ -62,6 +62,16 @@ def process_entity(entities, context):
                     continue
                 if no_treatment and e['type'] == '治疗方式':
                     continue
+                # 检查治疗方式 和疾病名称是否匹配
+                if e['type'] == '治疗方式':
+                    match_ = False
+                    for ent in ee:
+                        if ent['type'] == '疾病名称':
+                            for chld in ent['children']:
+                                if e['name'] in chld: 
+                                    match_ = True
+                    if not match_: 
+                        continue
                 ee.append(e)
         
     # intents process 

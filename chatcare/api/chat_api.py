@@ -21,9 +21,9 @@ async def chat_multi_turn(request: ChatKnowledgeBaseRequest, response: Response,
     # chat id check
     if not chat_id:
         chat_id = str(uuid.uuid4())
-        logger.info("---create a new chatid ~---")
+        logger.info(f"---create a new chatid:{chat_id} ~---")
+    logger.info(f"---chatid :{chat_id} ~---")
     response.set_cookie(key='chat_id', value=chat_id)
-    print(chat_id)
     if params.chat_mode == "vs":
         chat_completions_api = chat_direct_with_search_engine
     elif params.chat_mode == "llm":
