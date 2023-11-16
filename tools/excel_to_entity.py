@@ -72,8 +72,10 @@ def extract_treat_method(df, entity):
     df_sub.drop_duplicates(inplace=True)
     entity_synonym = {}
     for idx, df_item in df_sub.iterrows():
-        care_methods = df_item['治疗方式'].split('（')[0]
+        # care_methods = df_item['治疗方式'].split('（')[0]
+        care_methods = df_item['治疗方式']
         related = df_item['相关词']
+        # synonym = re.findall(r'[\u4e00-\u9fa5]+', related) + re.findall(r'[\u4e00-\u9fa5]+', df_item['治疗方式'])
         synonym = re.findall(r'[\u4e00-\u9fa5]+', related) + re.findall(r'[\u4e00-\u9fa5]+', df_item['治疗方式'])
         if care_methods in entity_synonym:
             entity_synonym[care_methods].extend(synonym)
@@ -89,6 +91,39 @@ def extract_treat_method(df, entity):
             }
         )
     return entity
+
+
+def extract_treat_method2(df, entity):
+    """抽取 `治疗方案` """
+    df_sub = df[['疾病名称', '治疗方式', '相关词']].copy()
+    df_sub.dropna(inplace=True)
+    df_sub.drop_duplicates(inplace=True)
+    # {keyword: {disease: treatment}}
+    # e.g.: 
+    # {'石膏固定': {'股骨颈骨折': '保守治疗（如石膏固定，牵引，卧床休息等）', '桡骨远端骨折': '保守治疗（如石膏固定，手法复位，小夹板等）'},}
+    keyword_treatment = {}  
+    for idx, df_item in df_sub.iterrows():
+        disease = df_item['疾病名称']
+        care_method = df_item['治疗方式']
+        related = df_item['相关词']
+        synonym = re.findall(r'[a-zA-Z\u4e00-\u9fa5]+', related) + re.findall(r'[\u4e00-\u9fa5]+', df_item['治疗方式'])
+        for k in synonym:
+            if k not in keyword_treatment:
+                keyword_treatment[k] = {disease: care_method}
+            else:
+                z = keyword_treatment[k]
+                if disease in z:
+                    print(disease, z)
+                    raise ValueError('xxxxx')
+                z[disease] = care_method
+    for k, v in keyword_treatment.items():
+        e = {
+            'name': k,
+            'type': '治疗方式',
+            'relation': v,
+        }
+        entity.append(e)
+    return entity 
 
 
 def extract_care_method(df, entity):
@@ -133,11 +168,11 @@ def run(excel_file, json_file='entity.json', is_synonym_plus=False):
     df_ill_kind, df_care_method = load_excel(excel_file)
     extract_ill_name(df_ill_kind, entity)
     extract_ill_label(df_ill_kind, entity)
-    extract_treat_method(df_ill_kind, entity)
+    extract_treat_method2(df_ill_kind, entity)
+    # extract_treat_method(df_ill_kind, entity)
     # extract_care_method(df_care_method, entity)  # 不需要支持单独问”操作”
-    if is_synonym_plus:
-        synonym_plus(entity)
-    json.dump(entity, open(json_file, 'w', encoding='utf-8'), ensure_ascii=False, indent=4)
+    
+    json.dump(entity, open(json_file, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
     logger.info(f"Generate entity to --> {os.path.abspath(json_file)}")
     return entity
 

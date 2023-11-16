@@ -13,7 +13,7 @@ db = ConnectionSync(
 entity2field = {
     1: {
         '疾病名称': 'disease',
-        '治疗方式': 'treatment',
+        '治疗方式': 'treatment_display',
     },
     2: {
         '操作名称': 'name',

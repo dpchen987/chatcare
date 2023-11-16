@@ -1,4 +1,5 @@
 import uuid
+import copy
 from chatcare.embeddings.embedding_bge import bge
 from chatcare.chains.intention_classify import classify
 from chatcare.utils.chat_cache import MemCache
@@ -15,100 +16,80 @@ CHAT_CACHE = MemCache()
 
 def process_entity(entities, context):
     msg, hints, slots = '', [], []
-    intent_entities = {}  # {intent_id: [entity,]}
-    has_disease_type = False
+    et_disease_type = None
+    et_disease = None
+    et_treatment = None
+    intent_id = '1'
     for et in entities:
-        tmp = []
         if et['type'] == '疾病类别':
-            context = None
-            children = '，'.join(et['children'])
-            msg = f"老年人的常见的{et['name']}有{children}等，颐小爱目前可以为您提供以上病种的护理信息支持，请问老人是哪种{et['name']}？"
-            hints = []
-            for c in et['children']:
-                for z in all_entities:
-                    if z['name'] == c:
-                        synonym = ','.join(z['synonym'][:1])
-                        x = f'{c}（{synonym}）'
-                        hints.append(x)
-            intent_entities['1'] = []
-            has_disease_type = True
-            continue
-        if et['type'] in ['疾病名称', '治疗方式']:
-            intent_id = '1'  # 查询疾病护理方案
-        elif et['type'] == '操作名称':
-            intent_id = '2'
-        else:
-            logger.warn(f'invalid entity type: {et["type"]}')
+            et_disease_type = copy.deepcopy(et)
             continue
         if et['type'] == '疾病名称':
-            hints = et['children']
-        tmp.append(et)
-        if intent_id in intent_entities:
-            intent_entities[intent_id].extend(tmp)
-        else:
-            intent_entities[intent_id] = tmp
+            et_disease = copy.deepcopy(et)
+            continue
+        if et['type'] == '治疗方式':
+            et_treatment = copy.deepcopy(et)
+            continue
     # context processing 
+    if et_disease:
+        et_disease_type = None
+    if et_disease_type and not et_disease:
+        et = et_disease_type
+        children = '，'.join(et['children'])
+        msg = f"老年人的常见的{et['name']}有{children}等，颐小爱目前可以为您提供以上病种的护理信息支持，请问老人是哪种{et['name']}？"
+        hints = []
+        for c in et['children']:
+            for z in all_entities:
+                if z['name'] == c:
+                    synonym = ','.join(z['synonym'][:1])
+                    x = f'{c}（{synonym}）'
+                    hints.append(x)
+        return msg, hints, intent_id, [et] 
     if context:
-        for iid, ee in intent_entities.items():
-            if iid != context['intent_id']:
+        for e in context['entities']:
+            if e['type'] == '疾病类别' and not et_disease_type:
+                et_disease_type = copy.deepcopy(e)
                 continue
-            types = [e['type'] for e in ee]
-            no_treatment = False
-            for e in ee:
-                if not e['children'] and e['type'] == '疾病名称':
-                    no_treatment = True
-            for e in context['entities']:
-                if e['type'] in types:
-                    continue
-                if no_treatment and e['type'] == '治疗方式':
-                    continue
-                # 检查治疗方式 和疾病名称是否匹配
-                if e['type'] == '治疗方式':
-                    match_ = False
-                    for ent in ee:
-                        if ent['type'] == '疾病名称':
-                            for chld in ent['children']:
-                                if e['name'] in chld: 
-                                    match_ = True
-                    if not match_: 
-                        continue
-                ee.append(e)
-        
-    # intents process 
-    intent_id = '0'
-    got_entities = []
-    if not intent_entities:
-        logger.warn(f'no invalid entity from {entities}')
+            if e['type'] == '疾病名称' and not et_disease:
+                et_disease = copy.deepcopy(e)
+                continue
+            if e['type'] == '治疗方式' and not et_treatment:
+                et_treatment = copy.deepcopy(e)
+                continue
+    logger.info(f'{context = }, {et_disease = }, {et_treatment = }')
+    if not et_disease_type and not et_disease and not et_treatment:
+        intent_id = '0'
         msg = '我不是很理解您的提问，请再详细说一下您的问题'
-    else:
-        intents = list(intent_entities.keys())
-        intents.sort()
-        intent_id = intents[0]
-        got_entities = intent_entities[intent_id]
-        logger.info(f'{got_entities = }')
-        got_slots = {g['type']: g for g in got_entities}
-        slots = intentions[intent_id]['slots']
-        logger.info(f'got entities: {got_entities}, slots: {slots}')
-        lack = []
-        no_treatment = False
-        for e in slots:
-            if e in got_slots:
-                if e == '疾病名称' and not got_slots[e]['children']:
-                    no_treatment = True
-                continue
-            if e == '治疗方式' and no_treatment:
-                continue
-            lack.append(e)
-        logger.info(f'{lack = }')
-        if not lack:
+        return msg, hints, intent_id, [] 
+    if et_disease:
+        got = []
+        got.append(et_disease)
+        if not et_disease['children']:
             msg = 'ok'
         else:
-            if not (has_disease_type and len(got_entities) == 0):
-                if lack[0] == '疾病名称':
-                    msg = '请问老人患有哪种疾病？'
-                else:
+            if not et_treatment:
+                msg = '请问老人采用哪种形式的治疗？'
+            else:
+                disease_name = et_disease['name']
+                if disease_name not in et_treatment['relation']:
+                    logger.warn(f'disease not match treatment, {et_disease = }, {et_treatment = }')
                     msg = '请问老人采用哪种形式的治疗？'
-    return msg, hints, intent_id, got_entities 
+                    hints = et_disease['children']
+                    return msg, hints, intent_id, [et_disease]
+                et_treatment['name'] = et_treatment['relation'][disease_name]
+                msg = 'ok'
+                got.append(et_treatment)
+        hints = et_disease['children']
+        return msg, hints, intent_id, got
+    else:
+        got = []
+        if et_treatment:
+            got.append(et_treatment)
+        msg = '请问老人患有哪种疾病？'
+        return msg, hints, intent_id, got
+    # somethins else
+    logger.info('something else')
+    return msg, hints, intent_id, []
 
 
 def chain(query, chat_id):
@@ -161,15 +142,20 @@ def chain(query, chat_id):
     # no entities
     embedding = bge.encode_queries([query])
     intent_id = classify(embedding)
+    # clear memory, start new topic
+    CHAT_CACHE.save(chat_id, 0, [])
 
     # return intent id & script
     if intent_id in intentions:
-        return {
-            'summary': intentions[intent_id]["intent_script"],
-            'intent_id': intent_id,
-            'hints': [],
-            'details': [],
-        }
+        summary = intentions[intent_id]["intent_script"]
+    else:
+        summary = intentions['0']['intent_script']
+    return {
+        'summary': summary,
+        'intent_id': intent_id,
+        'hints': [],
+        'details': [],
+    }
 
 
 if __name__ == "__main__":

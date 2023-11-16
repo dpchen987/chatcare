@@ -9,12 +9,17 @@ def _init_entity():
     entity_searcher = {}
     for item in entity:
         entity_searcher[item['name']] = item
+        if item['type'] == '治疗方式':
+            continue
         for synonym in item['synonym']:
             entity_searcher[synonym] = item
 
     # 2. gen jiea userdict
     jieba_dict_list = []
     for item in entity:
+        if item['type'] == '治疗方式':
+            jieba_dict_list.append(item['name'])
+            continue
         jieba_dict_list.append(item['name'])
         jieba_dict_list.extend(item['synonym'])
     jieba_dict_list = sorted(list(set(jieba_dict_list)))
@@ -35,6 +40,7 @@ def query_entity(query: str) -> list:
     Return:
         entities (List(Dict)): 实体列表
     """
+    query = query.upper()
     global entity_searcher
     seg_list = jieba.cut(query, cut_all=False)
     entities = []
