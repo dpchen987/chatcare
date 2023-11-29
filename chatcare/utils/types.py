@@ -58,6 +58,7 @@ class ChatCompletionResponse(BaseModel):
 
 
 class ChatKnowledgeBaseRequest(BaseModel):
+    chat_id: str = Field(..., min_length=1)
     messages: List[ChatMessage]
 
 class ChatKnowledgeBaseResponse(BaseModel):
