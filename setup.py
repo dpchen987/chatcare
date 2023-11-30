@@ -96,7 +96,7 @@ def main(use_cython=False):
         ext_modules=ext_modules,
         entry_points={
             'console_scripts': [
-                'chatcare=chatcare.webapi:run_api',
+                'chatcare=chatcare.webapi_sse:run_api',
             ]
         },
         # package_data={pkg_name: get_package_data()},
