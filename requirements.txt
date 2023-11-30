@@ -3,8 +3,8 @@ uvicorn
 FlagEmbedding
 pymilvus
 python-multipart
---extra-index-url https://download.pytorch.org/whl/cpu
-torch
 redis
 jieba
 ezmysql
+sse_starlette
+zhipuai
