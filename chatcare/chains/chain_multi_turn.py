@@ -1,8 +1,10 @@
-import uuid
+import time
 import copy
+import zhipuai
+
 from chatcare.embeddings.embedding_bge import bge
 from chatcare.chains.intention_classify import classify
-from chatcare.utils.chat_cache import MemCache
+from chatcare.utils.chat_cache import MemCache, MemCacheList
 from chatcare.utils.logger import logger
 
 from chatcare.chains.entity import query_entity
@@ -10,8 +12,14 @@ from chatcare.chains.entity import entity as all_entities
 from chatcare.chains.intention import intentions
 from chatcare.chains.kb_search_mysql import search_mysql
 from chatcare.config import params
+from .async_sse import sse_async
 
 CHAT_CACHE = MemCache()
+CACHE_LIST = MemCacheList()
+
+# company
+zhipuai.api_key = '880dcc0db4f8226d9ba785c74e377441.ldIxRW21PM6xxmDg'
+# zhipuai.api_key = '6574a4c99fa996c861b982bf256844c1.eDRvyeGFkczH8boH'
 
 
 def process_entity(entities, context):
@@ -30,7 +38,7 @@ def process_entity(entities, context):
         if et['type'] == '治疗方式':
             et_treatment = copy.deepcopy(et)
             continue
-    # context processing 
+    # context processing
     if et_disease:
         et_disease_type = None
     if et_disease_type and not et_disease:
@@ -72,7 +80,8 @@ def process_entity(entities, context):
             else:
                 disease_name = et_disease['name']
                 if disease_name not in et_treatment['relation']:
-                    logger.warn(f'disease not match treatment, {et_disease = }, {et_treatment = }')
+                    msg = f'disease not match treatment, {et_disease = }, {et_treatment = }'
+                    logger.warn(msg)
                     msg = '请问老人采用哪种形式的治疗？'
                     hints = et_disease['children']
                     return msg, hints, intent_id, [et_disease]
@@ -92,6 +101,66 @@ def process_entity(entities, context):
     return msg, hints, intent_id, []
 
 
+def gen_prompt(query):
+    prompt = f"假设你是一名资深的医学护理专业医生，请结合你的专业知识用{params.gpt_tokens}个字回答问题：{query}"
+    logger.info(prompt)
+    return prompt
+
+
+async def gpt_async(query):
+    prompt = gen_prompt(query)
+    gpt_params = dict(
+        api_key=zhipuai.api_key,
+        model="chatglm_turbo",
+        prompt=[{"role": "user", "content": prompt}],
+        top_p=0.7,
+        temperature=0.9,
+    )
+    async for event in sse_async(**gpt_params):
+        print(time.time(), event['data'])
+        yield event
+
+
+async def gpt_sse(query):
+    prompt = gen_prompt(query)
+    response = zhipuai.model_api.sse_invoke(
+        model="chatglm_turbo",
+        prompt=[{"role": "user", "content": prompt}],
+        top_p=0.7,
+        temperature=0.9,
+    )
+    for e in response.events():
+        event = {
+            'id': e.id,
+            'data': e.data,
+            'event': e.event,
+            'comment': e.meta,
+        }
+        yield event
+
+
+async def gpt(chat_id, query):
+    prompt = gen_prompt(query)
+    history = CACHE_LIST.get(chat_id)
+    history.append({"role": "user", "content": prompt})
+    logger.info(history)
+    response = zhipuai.model_api.invoke(
+        model="chatglm_turbo",
+        prompt=history,
+        top_p=0.7,
+        temperature=0.9,
+    )
+    if response['code'] == 200:
+        message = response['data']['choices'][0]
+        content = message['content'].replace('\\n', '\n').replace('\\"', '"').strip('\\" ')
+        message['content'] = content
+        CACHE_LIST.save(chat_id, message)
+        logger.info(response['data']['usage'])
+    else:
+        content = response['msg']
+    return content
+
+
 def chain(query, chat_id):
     '''
     query -> classify -> entity recgonition -> search -> answer
@@ -108,7 +177,8 @@ def chain(query, chat_id):
 
     '''
     if query == '新话题':
-        CHAT_CACHE.save(chat_id, 0, [])
+        CHAT_CACHE.remove(chat_id)
+        CACHE_LIST.remove(chat_id)
         return {
             'summary': '好的，我们开始新话题吧',
             'intent_id': 0,
@@ -146,10 +216,12 @@ def chain(query, chat_id):
     CHAT_CACHE.save(chat_id, 0, [])
 
     # return intent id & script
-    if intent_id in intentions:
+    print(f'xxxxxxxxx{ intent_id = }', type(intent_id))
+    if intent_id == '3':
         summary = intentions[intent_id]["intent_script"]
     else:
-        summary = intentions['0']['intent_script']
+        intent_id = '0'
+        summary = 'answered by GPT'
     return {
         'summary': summary,
         'intent_id': intent_id,

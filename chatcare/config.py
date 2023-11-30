@@ -54,6 +54,9 @@ params = Params(
     db_name='chatcare',
     db_user='ailab',
     db_pass='TheAIdb0',
+
+    # GPT
+    gpt_tokens=50,
 )
 
 
@@ -69,13 +72,15 @@ def update_params_from_env():
     params.host = os.getenv('HOST', params.host)
     params.port = int(os.getenv("PORT", params.port))
     params.chat_mode = os.getenv("CHAT_MODE", params.chat_mode)
-    params.debug = os.getenv("DEBUG", params.debug)
+    params.debug = bool(os.getenv("DEBUG", params.debug))
     params.root_path = os.getenv("ROOT_PATH", params.root_path)
     params.db_host = os.getenv('DB_HOST', params.db_host)
     params.db_port = int(os.getenv('DB_PORT', params.db_port))
     params.db_name = os.getenv('DB_NAME', params.db_name)
     params.db_user = os.getenv('DB_USER', params.db_user)
-    params.db_pass= os.getenv('DB_PASS', params.db_pass)
+    params.db_pass = os.getenv('DB_PASS', params.db_pass)
+    params.gpt_tokens = int(os.getenv('GPT_TOKENS', params.gpt_tokens))
+
 
 update_params_from_env()
 

@@ -338,7 +338,7 @@ video {
               $("#myModal").modal('show');
             });
           }
-        }, 40);
+        }, 10);
       };
     }(this);
     return this;
@@ -379,6 +379,8 @@ video {
       msg_input.draw();
       $('.message_input').val('');
       if(assistant) return;
+      $messages = $('.messages');
+      $messages.animate({ scrollTop: $messages.prop('scrollHeight') }, 100);
 
       // get response answer
       // text = '一共有以下几点：<a href="#" class="check_details" data="abcdef<img src=\'https://www.day-care.cn/wp-content/uploads/2023/04/one.png\'>"><br>1. 预防压疮</a><br><a class="check_details" data="zzzd">2. 预防伤口感染</a>';
