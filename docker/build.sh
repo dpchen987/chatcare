@@ -15,6 +15,8 @@ if [ -f "$torch_whl" ]; then
   echo "has $torch_whl"
 else
   wget https://download.pytorch.org/whl/cpu/torch-2.1.1%2Bcpu-cp38-cp38-linux_x86_64.whl -O $torch_whl
+fi
+
 if [ -f "$hnswlib_whl" ]; then
   echo "has $hnswlib_whl"
 else
