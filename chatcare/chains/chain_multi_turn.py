@@ -102,7 +102,7 @@ def process_entity(entities, context):
 
 
 def gen_prompt(query):
-    prompt = f"假设你是一名资深的医学护理专业医生，请结合你的专业知识用{params.gpt_tokens}个字回答问题：{query}"
+    prompt = f"假设你是一名资深的居家护理师，具有丰富的康养和护理知识，请结合你的专业知识用{params.gpt_tokens}个字以内回答问题：{query}"
     logger.info(prompt)
     return prompt
 
