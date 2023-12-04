@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+FlagEmbedding
+pymilvus
+python-multipart
+redis
+jieba
+ezmysql
+sse_starlette
+zhipuai
