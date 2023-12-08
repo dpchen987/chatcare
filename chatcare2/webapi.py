@@ -3,9 +3,9 @@
 import time
 import uuid
 import json
-import torch
+# import torch
 import uvicorn
-from typing import Annotated
+from typing import Annotated, Union
 
 from fastapi import FastAPI, Response, Cookie
 from fastapi.middleware.cors import CORSMiddleware
@@ -24,12 +24,12 @@ from chatcare2.config import params
 from chatcare2.chains import chain_multi_turn
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):  # collects GPU memory
-    yield
-    if torch.cuda.is_available():
-        torch.cuda.empty_cache()
-        torch.cuda.ipc_collect()
+# @asynccontextmanager
+# async def lifespan(app: FastAPI):  # collects GPU memory
+#     yield
+#     if torch.cuda.is_available():
+#         torch.cuda.empty_cache()
+#         torch.cuda.ipc_collect()
 
 
 def create_app():
@@ -70,7 +70,7 @@ def create_app():
     async def chat_multi_turn(
         chat_request: ChatKnowledgeBaseRequest,
         response: Response,
-        chat_id: Annotated[str | None, Cookie()] = None,
+        chat_id: Annotated[Union[str, None], Cookie()] = None,
     ) -> ChatKnowledgeBaseResponse:
         """chatcare2对话接口: 旧版，标准http 协议，增加GPT
         """
