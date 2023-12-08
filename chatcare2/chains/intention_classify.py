@@ -1,26 +1,18 @@
 #!/usr/bin/env python3
-
-import torch
+import numpy as np
+import onnxruntime as rt
 from chatcare2.utils.logger import logger
-from chatcare2.utils.classification_model import EmbeddingClassification
 from chatcare2.config import params
 
-torch.manual_seed(1258)
-model = EmbeddingClassification(
-    params.embed_dim, params.num_class_intention)
-model.load_state_dict(torch.load(params.classify_intention_path))
-model.eval()
-
+model = rt.InferenceSession(params.classify_intention_path, providers=['CPUExecutionProvider'])
+input_name = model.get_inputs()[0].name
 
 def classify(embed):
     '''
     attention: input is embedding of text
     '''
-    embed = torch.tensor(embed, dtype=torch.float)
-    with torch.no_grad():
-        ilabel = model(embed)
-    ilabel = int(ilabel.argmax(dim=1)[0])
+    ilabel = model.run(None, {input_name: embed})[0]
+    ilabel = int(np.argmax(ilabel, axis=1)[0])
     logger.info(f"attention id : {ilabel}")
     return str(ilabel)
-
 

@@ -25,7 +25,7 @@ params = Params(
     classify_model_path='/workspace/models/embedding_classify.pt',
     # cf2
     num_class_intention=5,
-    classify_intention_path='/workspace/models/intention_classify.pt',
+    classify_intention_path='/workspace/models/intention_classify.onnx',
     intention_inf_json = '/workspace/knowledge_base/qa/intention.json',
 
     # dev params
