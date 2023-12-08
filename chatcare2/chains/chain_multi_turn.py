@@ -12,7 +12,7 @@ from chatcare2.chains.entity import entity as all_entities
 from chatcare2.chains.intention import intentions
 from chatcare2.chains.kb_search_mysql import search_mysql
 from chatcare2.config import params
-from .async_sse import sse_async
+# from .async_sse import sse_async
 
 CHAT_CACHE = MemCache()
 CACHE_LIST = MemCacheList()
