@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-fn = '../chatcare/__init__.py'
+fn = '../chatcare2/__init__.py'
 version = '0.0.0'
 with open(fn) as f:
     for line in f:
