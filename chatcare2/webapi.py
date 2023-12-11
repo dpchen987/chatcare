@@ -3,7 +3,6 @@
 import time
 import uuid
 import json
-# import torch
 import uvicorn
 from typing import Annotated, Union
 
@@ -24,19 +23,10 @@ from chatcare2.config import params
 from chatcare2.chains import chain_multi_turn
 
 
-# @asynccontextmanager
-# async def lifespan(app: FastAPI):  # collects GPU memory
-#     yield
-#     if torch.cuda.is_available():
-#         torch.cuda.empty_cache()
-#         torch.cuda.ipc_collect()
-
-
 def create_app():
     app = FastAPI(
         title="chatcare2 API Server",
         version=__version__,
-        lifespan=lifespan,
     )
     # 跨域
     app.add_middleware(
