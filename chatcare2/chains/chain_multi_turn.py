@@ -15,7 +15,10 @@ from chatcare2.config import params
 # from .async_sse import sse_async
 
 CHAT_CACHE = MemCache()
-CACHE_LIST = MemCacheList()
+CACHE_LIST = MemCacheList(
+    count=params.gpt_count,
+    expire=params.gpt_expire,
+)
 
 # company
 zhipuai.api_key = '880dcc0db4f8226d9ba785c74e377441.ldIxRW21PM6xxmDg'
@@ -107,18 +110,18 @@ def gen_prompt(query):
     return prompt
 
 
-async def gpt_async(query):
-    prompt = gen_prompt(query)
-    gpt_params = dict(
-        api_key=zhipuai.api_key,
-        model="chatglm_turbo",
-        prompt=[{"role": "user", "content": prompt}],
-        top_p=0.7,
-        temperature=0.9,
-    )
-    async for event in sse_async(**gpt_params):
-        print(time.time(), event['data'])
-        yield event
+# async def gpt_async(query):
+#     prompt = gen_prompt(query)
+#     gpt_params = dict(
+#         api_key=zhipuai.api_key,
+#         model="chatglm_turbo",
+#         prompt=[{"role": "user", "content": prompt}],
+#         top_p=0.7,
+#         temperature=0.9,
+#     )
+#     async for event in sse_async(**gpt_params):
+#         print(time.time(), event['data'])
+#         yield event
 
 
 async def gpt_sse(query):
@@ -142,7 +145,8 @@ async def gpt_sse(query):
 async def gpt(chat_id, query):
     prompt = gen_prompt(query)
     history = CACHE_LIST.get(chat_id)
-    history.append({"role": "user", "content": prompt})
+    new_message = {"role": "user", "content": prompt}
+    history.append(new_message)
     logger.info(history)
     response = zhipuai.model_api.invoke(
         model="chatglm_turbo",
@@ -154,6 +158,7 @@ async def gpt(chat_id, query):
         message = response['data']['choices'][0]
         content = message['content'].replace('\\n', '\n').replace('\\"', '"').strip('\\" ')
         message['content'] = content
+        CACHE_LIST.save(chat_id, new_message)
         CACHE_LIST.save(chat_id, message)
         logger.info(response['data']['usage'])
     else:
