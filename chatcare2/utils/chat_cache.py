@@ -2,25 +2,34 @@ import time
 
 
 class MemCacheList:
-    def __init__(self, max_length=10):
+    def __init__(self, count=10, expire=180):
         self.cache = {}
-        self.max_length = max_length
+        self.count = count
+        self.expire = expire
 
     def save(self, chat_id, message):
+        now = time.time()
         if chat_id in self.cache:
-            self.cache[chat_id].append(message)
+            self.cache[chat_id].append((message, now))
         else:
-            self.cache[chat_id] = [message]
-        while len(self.cache[chat_id]) > self.max_length:
+            self.cache[chat_id] = [(message, now)]
+        while len(self.cache[chat_id]) > self.count:
             self.cache[chat_id].pop(0)
 
     def get(self, chat_id):
         if chat_id not in self.cache:
             self.cache[chat_id] = []
         cachelist = self.cache.get(chat_id)
-        while len(cachelist) > self.max_length:
-            cachelist.pop(0)
-        return cachelist
+        good = []
+        now = time.time()
+        for c in cachelist:
+            if now - c[1] > self.expire:
+                continue
+            good.append(c) 
+        good = good[-self.count:]
+        self.cache[chat_id] = good
+        result = [c[0] for c in good]
+        return result
 
     def remove(self, chat_id):
         if chat_id in self.cache:
