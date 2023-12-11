@@ -39,7 +39,9 @@ params = Params(
     db_pass='TheAIdb0',
 
     # GPT
-    gpt_tokens=50,
+    gpt_tokens=25,
+    gpt_count=10,
+    gpt_expire=300,
 )
 
 
@@ -62,6 +64,8 @@ def update_params_from_env():
     params.db_user = os.getenv('DB_USER', params.db_user)
     params.db_pass = os.getenv('DB_PASS', params.db_pass)
     params.gpt_tokens = int(os.getenv('GPT_TOKENS', params.gpt_tokens))
+    params.gpt_count= int(os.getenv('GPT_COUNT', params.gpt_count))
+    params.gpt_expire= int(os.getenv('GPT_EXPIRE', params.gpt_expire))
 
 
 update_params_from_env()
