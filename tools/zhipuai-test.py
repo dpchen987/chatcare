@@ -7,6 +7,8 @@ def gpt(query):
     response = zhipuai.model_api.invoke(
         model="chatglm_turbo",
         prompt=[
+            {"role": "user", "content": "你好啊"},
+            {"role": "assistant", "content": ""},
             {"role": "user", "content": f"假设你是一名资深的居家护理师，具有丰富的医疗、康复和护理知识，请用约25字回答：{query}"},
             # {"role": "user", "content": f"{query}"},
         ],
