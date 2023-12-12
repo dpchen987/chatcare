@@ -147,7 +147,7 @@ async def gpt(chat_id, query):
     history = CACHE_LIST.get(chat_id)
     new_message = {"role": "user", "content": prompt}
     history.append(new_message)
-    logger.info(history)
+    logger.info(f'GPT query message: {history}')
     response = zhipuai.model_api.invoke(
         model="chatglm_turbo",
         prompt=history,
