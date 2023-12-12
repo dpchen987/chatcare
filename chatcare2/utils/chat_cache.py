@@ -2,7 +2,7 @@ import time
 
 
 class MemCacheList:
-    def __init__(self, count=10, expire=180):
+    def __init__(self, count=10, expire=300):
         self.cache = {}
         self.count = count
         self.expire = expire
@@ -17,9 +17,7 @@ class MemCacheList:
             self.cache[chat_id].pop(0)
 
     def get(self, chat_id):
-        if chat_id not in self.cache:
-            self.cache[chat_id] = []
-        cachelist = self.cache.get(chat_id)
+        cachelist = self.cache.get(chat_id, [])
         good = []
         now = time.time()
         for c in cachelist:
